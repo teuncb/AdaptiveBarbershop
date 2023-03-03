@@ -10,21 +10,52 @@ namespace AdaptiveBarbershop
             Console.WriteLine("Please enter a note.");
 
             string msg = "";
-            while(msg != "exit")
+            while(msg != "chord")
             {
                 msg = Console.ReadLine();
                 Note note = new Note(msg);
                 Console.WriteLine("This note corresponds to key {0}", note.key.ToString());
+            }
+
+            Console.WriteLine("Please enter a chord.");
+
+            while (msg != "exit")
+            {
+                msg = Console.ReadLine();
+                Chord chord = new Chord(msg, 0);
+                Console.WriteLine("This chord is {0} and contains {1}, {2}, {3} and {4}. It takes {5} ticks.", chord.chordName,
+                    chord.notes[0].key.ToString(), chord.notes[1].key.ToString(), 
+                    chord.notes[2].key.ToString(), chord.notes[3].key.ToString(), chord.duration);
             }
         }
     }
 
     class Chord
     {
-        Note[] notes;
-        int masterBend;
-        int startTime;
-        int duration;
+        public Note[] notes;
+        public int masterBend;
+        public int startTime;
+        public int duration;
+        public string chordName;
+
+        public Chord(string input, int start)
+        {
+            // Split the input string into chord name, 4 notes, and duration
+            char[] delimiters = { '(', ')', ',' };
+            string[] portions = input.Split(delimiters);
+
+            chordName = portions[0];
+
+            // Make a Note object for each note input string
+            notes = new Note[4];
+            for(int i = 0; i < notes.Length; i++)
+            {
+                notes[i] = new Note(portions[i]);
+            }
+
+            startTime = start;
+            duration = int.Parse(portions[5]);
+        }
     }
 
     class Note
