@@ -5,37 +5,38 @@ namespace AdaptiveBarbershop
 {
     class Note
     {
-        public int key;
+        public int midiKey;
         // TODO replace key with noteName/octave combination, since we'll tune according to note names
-        public string noteName;
+        public int noteNum;
         public int octave;
         public bool tied;
-        public int indivBend;
+        public double indivBend;
+
+        // Translates note names within the octave
+        private static Dictionary<string, int> noteNames = new Dictionary<string, int>
+        {
+                         { "cn", 0 }, { "c#", 1 },
+            { "db", 1 }, { "dn", 2 }, { "d#", 3 },
+            { "eb", 3 }, { "en", 4 }, { "e#", 5 },
+            { "fb", 4 }, { "fn", 5 }, { "f#", 6 },
+            { "gb", 6 }, { "gn", 7 }, { "g#", 8 },
+            { "ab", 8 }, { "an", 9 }, { "a#", 10},
+            { "bb", 10}, { "bn", 11}
+        };
 
         public Note(string input)
         {
-            key = 88;
-
-            // Translates note names within the octave
-            // TODO figure out where to initialise this, probably not here
-            Dictionary<string, int> noteNames = new Dictionary<string, int>
-            {
-                              { "an",  0 }, { "a#",  1 },
-                { "bb",  1 }, { "bn",  2 }, { "b#",  3 },
-                { "cb",-10 }, { "cn", -9 }, { "c#", -8 },
-                { "db", -8 }, { "dn", -7 }, { "d#", -6 },
-                { "eb", -6 }, { "en", -5 }, { "e#", -4 },
-                { "fb", -5 }, { "fn", -4 }, { "f#", -3 },
-                { "gb", -3 }, { "gn", -2 }, { "g#", -1},
-                { "ab", -1}
-            };
+            midiKey = 88;
 
             Console.WriteLine("Building note from input string " + input);
-            key = int.Parse(input.Substring(2,1)) * 12 + noteNames[input.Substring(0,2)];
+            noteNum = noteNames[input.Substring(0, 2)];
+            octave = int.Parse(input.Substring(2, 1));
+            // Lowest MIDI key is A0, which has octave 0 and noteID 9
+            midiKey = octave * 12 + noteNum - 9;
 
-            if(key < 0 || key > 88)
+            if(midiKey < 0 || midiKey > 88)
             {
-                throw new Exception(string.Format("The note \"{0}\" corresponds to key {1}, which is out of range", input, key));
+                throw new Exception(string.Format("The note \"{0}\" corresponds to MIDI key {1}, which is out of range", input, midiKey));
             }
 
             switch (input[3])

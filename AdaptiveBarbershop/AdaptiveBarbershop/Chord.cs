@@ -3,10 +3,10 @@
     class Chord
     {
         public Note[] notes;
-        public int masterBend;
+        public double masterBend;
         public int startTime;
         public int duration;
-        public string chordName;
+        public string chordName;  // TODO meer commentaar
 
         public Chord(string input, int start)
         {
@@ -25,6 +25,7 @@
 
             startTime = start;
             duration = int.Parse(portions[5]);
+            masterBend = 0;
         }
     }
 }
