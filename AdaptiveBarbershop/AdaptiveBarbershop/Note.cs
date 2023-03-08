@@ -13,15 +13,15 @@ namespace AdaptiveBarbershop
         public double indivBend;
 
         // Translates note names within the octave
-        private static Dictionary<string, int> noteNames = new Dictionary<string, int>
+        public static Dictionary<string, int> noteNames = new Dictionary<string, int>
         {
-                         { "cn", 0 }, { "c#", 1 },
+            { "cb",-1 }, { "cn", 0 }, { "c#", 1 },
             { "db", 1 }, { "dn", 2 }, { "d#", 3 },
             { "eb", 3 }, { "en", 4 }, { "e#", 5 },
             { "fb", 4 }, { "fn", 5 }, { "f#", 6 },
             { "gb", 6 }, { "gn", 7 }, { "g#", 8 },
             { "ab", 8 }, { "an", 9 }, { "a#", 10},
-            { "bb", 10}, { "bn", 11}
+            { "bb", 10}, { "bn", 11}, { "b#", 12}
         };
 
         public Note(string input)
