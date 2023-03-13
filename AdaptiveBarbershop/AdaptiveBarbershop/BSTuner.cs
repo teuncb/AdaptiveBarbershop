@@ -6,18 +6,18 @@ using System.IO;
 
 namespace AdaptiveBarbershop
 {
-    class Song
+    class BSTuner
     {
         private double halfStepSize;
         private int[] voicesOrder;
 
-        private double tieRange;
-        private double leadRange;
+        private Range tieRange;
+        private Range leadRange;
 
         private Dictionary<char, Fraction[]> tuningTables;
 
         // Initialise the tuner type, setting the global parameters
-        public Song(double stepSize = 1, double tieR = 0.03, double leadR = 0.15,
+        public BSTuner(double stepSize = 1, double tieRadius = 0.03, double leadRadius = 0.15,
             string pathMaj     = "../../../../../TuningTables/maj_lim17.txt",
             string pathMin     = "../../../../../TuningTables/min_lim7.txt",
             string pathDom     = "../../../../../TuningTables/maj_lim17.txt",
@@ -27,8 +27,8 @@ namespace AdaptiveBarbershop
             halfStepSize = stepSize;
             voicesOrder = new int[4]{ 2, 0, 3, 1 };
 
-            tieRange = tieR;
-            leadRange = leadR;
+            tieRange = new Range(-tieRadius, tieRadius);
+            leadRange = new Range(-leadRadius, leadRadius);
 
             tuningTables = new Dictionary<char, Fraction[]>(5);
             tuningTables.Add('M', TuningTable(pathMaj));
@@ -38,7 +38,8 @@ namespace AdaptiveBarbershop
             tuningTables.Add('0', TuningTable(pathHalfDim));
         }
 
-        // Given a bend range as a fraction of a half step, randomly assign individual bends to each note
+        // Given a bend range as a fraction of a half step, randomly assign individual bends to each note in a chord
+        // This function was mostly useful for debugging
         public void RandomlyAssignTunings(Chord chord, double bendRange = 0.3)
         {
             Random random = new Random();
@@ -50,6 +51,7 @@ namespace AdaptiveBarbershop
         }
 
         // Initialise a table of interval fractions from a file
+        // These are the fractions that will be used for just intonation intervals in the vertical step
         public Fraction[] TuningTable(string tablePath)
         {
             // Require exactly 12 fractions
@@ -79,7 +81,8 @@ namespace AdaptiveBarbershop
         {
             foreach (Note note in chord.notes)
             {
-                note.indivBend = GetIndivBend(note.noteNum, chord.root, tuningTables[chord.chordType]);
+                if (note.playing)
+                    note.indivBend = GetIndivBend(note.noteNum, chord.root, tuningTables[chord.chordType]);
             }
         }
 
@@ -100,7 +103,6 @@ namespace AdaptiveBarbershop
             return indivBend;
         }
 
-        // TODO maybe actually make tieRange and leadRange into Ranges
         // TODO this currently prioritises ties over lead, make that a parameter option by changing the order of ranges
         // TODO optionally, add the lead functionality to the bass as well
         public double GetMasterBend(Chord prevChord, Chord currChord)
@@ -133,7 +135,7 @@ namespace AdaptiveBarbershop
 
             // Determine the optimal masterBend for currChord
             // Option 1: all can be optimised by setting the masterBend to 0
-            if (tieDiffs.All(diff => diff >= -tieRange && diff <= tieRange) && leadDiff >= -leadRange && leadDiff <= leadRange)
+            if (tieDiffs.All(diff => tieRange.Contains(diff)) && leadRange.Contains(leadDiff))
             {
                 currChord.masterBend = 0;
                 return 0;
@@ -143,13 +145,14 @@ namespace AdaptiveBarbershop
             {
                 // ranges contains, for each tied note & lead note in these chords,
                 // its mvmnt needed to reach bottom bound (range.lower) and mvmnt needed to reach top bound (range.upper)
+                // In other words, it's the amount that the masterbend is allowed to move up and down to satisfy this note
                 Range[] ranges = new Range[tieDiffs.Length + 1];
                 for (int i = 0; i < tieDiffs.Length; i++)
                 {
-                    ranges[i] = new Range(-tieRange + tieDiffs[i], tieRange + tieDiffs[i]);
+                    ranges[i] = tieRange.MoveBy(tieDiffs[i]);
                 }
 
-                ranges[ranges.Length - 1] = new Range(-leadRange + leadDiff, leadRange + leadDiff);
+                ranges[ranges.Length - 1] = leadRange.MoveBy(leadDiff);
 
                 // Set the initial boundaries in which the new masterBend should be chosen
                 Range masterBendRange = ranges[0];
@@ -214,6 +217,12 @@ namespace AdaptiveBarbershop
                 lower = l;
                 upper = u;
             }
+
+            public bool Contains(double x)
+            {
+                return (x >= lower && x <= upper);
+            }
+
             // Returns 'o' if r1 and r2 overlap; 'h' if r2 is completely above r1; 'l' if r2 is completely below r1.
             public static double Distance(Range r1, Range r2)
             {
@@ -254,6 +263,14 @@ namespace AdaptiveBarbershop
                     // There is no overlap
                     throw new ArgumentException("These two ranges do not overlap.");
                 }
+            }
+            // Move both bounds of a Range up by a given distance
+            public Range MoveBy(double distance)
+            {
+                Range res = this;
+                res.lower += distance;
+                res.upper += distance;
+                return res;
             }
 
             // Define equality operators for the Range struct

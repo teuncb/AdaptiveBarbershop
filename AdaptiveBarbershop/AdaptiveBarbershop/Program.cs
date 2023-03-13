@@ -8,12 +8,12 @@ namespace AdaptiveBarbershop
         {
             // VERTICAL STEP TESTING CODE
             Chord chord1 = new Chord("EnM(cb3t,bn3 ,en4t,g#4 )280", 0);
-            //Chord chord2 = new Chord("Anm(en3t,cn4 ,en4t,cb4 )280", 280);
+            Chord chord2 = new Chord("Anm(en3t,cn4 ,    ,cb4 )280", 280);
 
-            Song song = new Song();
+            BSTuner song = new BSTuner();
 
             song.SetIndivBends(chord1);
-            //song.SetIndivBends(chord2);
+            song.SetIndivBends(chord2);
 
             Console.WriteLine("Success!");
             Console.ReadLine();
@@ -50,7 +50,7 @@ namespace AdaptiveBarbershop
             //    msg = Console.ReadLine();
             //    Chord chord = new Chord(msg, 0);
             //    Console.WriteLine("This chord is a {0} with root {1} and contains {2}, {3}, {4} and {5}. It takes {6} ticks.",
-            //        chord.chordType, chord.root, 
+            //        chord.chordType, chord.root,
             //        chord.notes[0].midiKey.ToString(), chord.notes[1].midiKey.ToString(),
             //        chord.notes[2].midiKey.ToString(), chord.notes[3].midiKey.ToString(), chord.duration);
             //}

@@ -5,12 +5,12 @@ namespace AdaptiveBarbershop
 {
     class Note
     {
-        public int midiKey;
-        // TODO replace key with noteName/octave combination, since we'll tune according to note names
+        public bool playing;
         public int noteNum;
         public int octave;
         public bool tied;
         public double indivBend;
+        public int midiKey; // TODO This isn't necessarily right after bending, when I'm implementing MIDI I should change this
 
         // Translates note names within the octave
         public static Dictionary<string, int> noteNames = new Dictionary<string, int>
@@ -26,6 +26,13 @@ namespace AdaptiveBarbershop
 
         public Note(string input)
         {
+            if(input == "    ")
+            {
+                playing = false;
+                return;
+            }
+
+            playing = true;
             midiKey = 88;
 
             Console.WriteLine("Building note from input string " + input);
