@@ -7,7 +7,7 @@ namespace AdaptiveBarbershop
         static void Main(string[] args)
         {
             // FULL ALGORITHM TESTING CODE
-            Song outThere = new Song("../../../../../Songs/out_there.txt");
+            Song outThere = new Song("../../../../../Songs/good_close_harmony.txt");
             BSTuner tuner = new BSTuner();
 
             tuner.TuneSong(outThere);

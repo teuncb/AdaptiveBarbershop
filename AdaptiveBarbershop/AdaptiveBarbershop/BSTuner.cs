@@ -8,24 +8,34 @@ namespace AdaptiveBarbershop
 {
     class BSTuner
     {
+        // Scale for the double values used in the algorithm, usually just 1.0 (so a cent is 0.01)
         private double halfStepSize;
-        private int[] voicesOrder;
+        // The 4 voices in order of importance. When optimising tied notes, the lead should be
+        // handled first, then the bass, then the tenor and lastly the baritone.
+        private static int[] voicesOrder = new int[4] { 2, 0, 3, 1 };
+        // Either l for lead or t for tied notes: which one should be optimised first?
+        private char priority;
+        private static HashSet<char> prioTypes = new HashSet<char> { 'l', 't' };
 
-        private Range tieRange;
-        private Range leadRange;
+        private Range tieRange; // How much tied notes are allowed to retune
+        private Range leadRange; // How much the lead is allowed to differentiate from 12TET
 
+        // Maps a chord type to its array of interval ratios in just intonation
         private Dictionary<char, Fraction[]> tuningTables;
 
         // Initialise the tuner type, setting the global parameters
-        public BSTuner(double stepSize = 1, double tieRadius = 0.03, double leadRadius = 0.15,
+        public BSTuner(double stepSize = 1, double tieRadius = 0.03, double leadRadius = 0.15, char prio = 't',
             string pathMaj     = "../../../../../TuningTables/maj_lim17.txt",
             string pathMin     = "../../../../../TuningTables/min_lim7.txt",
             string pathDom     = "../../../../../TuningTables/maj_lim17.txt",
             string pathDim7    = "../../../../../TuningTables/dim7_lim17.txt",
             string pathHalfDim = "../../../../../TuningTables/min_lim7.txt")
         {
+            if (!prioTypes.Contains(prio))
+                throw new ArgumentException(prio.ToString() + " is not a valid priority type, should be either l or t");
+
             halfStepSize = stepSize;
-            voicesOrder = new int[4]{ 2, 0, 3, 1 };
+            priority = prio;
 
             tieRange = new Range(-tieRadius, tieRadius);
             leadRange = new Range(-leadRadius, leadRadius);
@@ -171,12 +181,27 @@ namespace AdaptiveBarbershop
                 // its mvmnt needed to reach bottom bound (range.lower) and mvmnt needed to reach top bound (range.upper)
                 // In other words, it's the amount that the masterbend is allowed to move up and down to satisfy this note
                 Range[] ranges = new Range[tieDiffs.Length + 1];
-                for (int i = 0; i < tieDiffs.Length; i++)
-                {
-                    ranges[i] = tieRange.MoveBy(tieDiffs[i]);
-                }
 
-                ranges[ranges.Length - 1] = leadRange.MoveBy(leadDiff);
+                // Ties are more important
+                if (priority == 't')
+                {
+                    for (int i = 0; i < tieDiffs.Length; i++)
+                    {
+                        ranges[i] = tieRange.MoveBy(tieDiffs[i]);
+                    }
+
+                    ranges[ranges.Length - 1] = leadRange.MoveBy(leadDiff);
+                }
+                // Lead is more important
+                else
+                {
+                    ranges[ranges.Length - 1] = leadRange.MoveBy(leadDiff);
+
+                    for (int i = 0; i < tieDiffs.Length; i++)
+                    {
+                        ranges[i] = tieRange.MoveBy(tieDiffs[i]);
+                    }
+                }
 
                 // Set the initial boundaries in which the new masterBend should be chosen
                 Range masterBendRange = ranges[0];
