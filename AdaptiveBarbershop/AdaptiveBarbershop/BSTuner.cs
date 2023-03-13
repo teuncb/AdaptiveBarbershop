@@ -38,9 +38,29 @@ namespace AdaptiveBarbershop
             tuningTables.Add('0', TuningTable(pathHalfDim));
         }
 
+        // Master method for the tuning algorithm: tunes an entire song
+        public void TuneSong(Song song)
+        {
+            // Carry out the vertical step for each chord
+            for (int i = 0; i < song.chords.Length; i++)
+            {
+                SetIndivBends(song.chords[i]);
+            }
+
+            // Set the lead to equal temperament in the first chord
+            InitialMasterBend(song.chords[0]);
+
+            // Carry out the horizontal step for each subsequent chord
+            for (int i = 1; i < song.chords.Length; i++)
+            {
+                double mb = SetMasterBend(song.chords[i - 1], song.chords[i]);
+                Console.WriteLine("Set master bend for chord {0} to {1:0.0000}", i, mb);
+            }
+        }
+
         // Given a bend range as a fraction of a half step, randomly assign individual bends to each note in a chord
         // This function was mostly useful for debugging
-        public void RandomlyAssignTunings(Chord chord, double bendRange = 0.3)
+        public void RandomlyAssignIndivBends(Chord chord, double bendRange = 0.3)
         {
             Random random = new Random();
 
@@ -55,22 +75,18 @@ namespace AdaptiveBarbershop
         public Fraction[] TuningTable(string tablePath)
         {
             // Require exactly 12 fractions
-            int lineCount = File.ReadAllLines(tablePath).Length;
-            if(lineCount != 12)
+            string[] lines = File.ReadAllLines(tablePath);
+            if(lines.Length != 12)
             {
                 throw new FormatException(string.Format("The file {0} doesn't have exactly 12 lines, which is required", tablePath));
             }
 
-            StreamReader sr = new StreamReader(tablePath);
+            // Build an array of the 12 interval fractions in the file
             Fraction[] tuningTable = new Fraction[12];
 
-            // Each line in the file corresponds to a single fraction
-            string line;
-            int index = 0;
-            while ((line = sr.ReadLine()) != null)
+            for(int i = 0; i < lines.Length; i++)
             {
-                tuningTable[index] = new Fraction(line);
-                index++;
+                tuningTable[i] = new Fraction(lines[i]);
             }
 
             return tuningTable;
@@ -100,12 +116,20 @@ namespace AdaptiveBarbershop
 
             // Return how much note should deviate from equal temperament
             double indivBend = fullDist - distInHalfSteps * halfStepSize;
+            Console.WriteLine("Tuning note {0} with root {1} to value {2:0.0000}", note, root, indivBend);
             return indivBend;
+        }
+
+        // Set the masterBend for the very first Chord such that the lead sings an equal temperament note
+        public double InitialMasterBend(Chord firstChord)
+        {
+            firstChord.masterBend = -firstChord.notes[2].indivBend;
+            return firstChord.masterBend;
         }
 
         // TODO this currently prioritises ties over lead, make that a parameter option by changing the order of ranges
         // TODO optionally, add the lead functionality to the bass as well
-        public double GetMasterBend(Chord prevChord, Chord currChord)
+        public double SetMasterBend(Chord prevChord, Chord currChord)
         {
             // Make a list of note indices that have a tie property, ordered like voicesOrder
             List<int> ties = new List<int>();

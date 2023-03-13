@@ -6,17 +6,25 @@ namespace AdaptiveBarbershop
     {
         static void Main(string[] args)
         {
-            // VERTICAL STEP TESTING CODE
-            Chord chord1 = new Chord("EnM(cb3t,bn3 ,en4t,g#4 )280", 0);
-            Chord chord2 = new Chord("Anm(en3t,cn4 ,    ,cb4 )280", 280);
+            // FULL ALGORITHM TESTING CODE
+            Song outThere = new Song("../../../../../Songs/out_there.txt");
+            BSTuner tuner = new BSTuner();
 
-            BSTuner song = new BSTuner();
-
-            song.SetIndivBends(chord1);
-            song.SetIndivBends(chord2);
-
-            Console.WriteLine("Success!");
+            tuner.TuneSong(outThere);
+            Console.WriteLine("Success!?");
             Console.ReadLine();
+
+            // VERTICAL STEP TESTING CODE
+            //Chord chord1 = new Chord("EnM(cb3t,bn3 ,en4t,g#4 )280", 0);
+            //Chord chord2 = new Chord("Anm(en3t,cn4 ,    ,cb4 )280", 280);
+
+            //BSTuner tuner = new BSTuner();
+
+            //tuner.SetIndivBends(chord1);
+            //tuner.SetIndivBends(chord2);
+
+            //Console.WriteLine("Success!");
+            //Console.ReadLine();
 
             // HORIZONTAL STEP TESTING CODE
             //Chord chord1 = new Chord("EnM(en3t,bn3 ,en4t,g#4 )280", 0);
@@ -24,10 +32,10 @@ namespace AdaptiveBarbershop
 
             //Song song = new Song();
 
-            //song.RandomlyAssignTunings(chord1, 0.05);
-            //song.RandomlyAssignTunings(chord2, 0.08);
+            //song.RandomlyAssignIndivBends(chord1, 0.05);
+            //song.RandomlyAssignIndivBends(chord2, 0.08);
 
-            //Console.WriteLine("New tuning: " + song.GetMasterBend(chord1, chord2, 0.03, 0.15).ToString());
+            //Console.WriteLine("New tuning: " + song.SetMasterBend(chord1, chord2, 0.03, 0.15).ToString());
             //Console.ReadLine();
 
             ////NOTES AND CHORDS TESTING CODE

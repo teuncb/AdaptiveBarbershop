@@ -1,0 +1,6 @@
+BbM(fn3 ,bb3 ,dn4 ,fn4 )280
+Gb7(gb3 ,bb3 ,en4 ,db4 )280
+Cn0(gb3 ,bb3 ,cn4t,eb4t)140
+Fn7(fn4 ,an3 ,cn4 ,eb4 )420
+Eb7(eb3 ,gn3 ,bb3 ,c#4 )280
+BbM(bb2 ,fn3 ,bb3 ,dn4 )560
