@@ -1,4 +1,4 @@
-1/1
+1/1		# This dim7 chord is tuned 10:12:14:17. Fundamental (like min_lim7) is an 8vb major third lower.
 16/15
 28/25
 6/5
@@ -7,6 +7,6 @@
 7/5
 3/2
 8/5
-33/20
-17/10
+17/10	# This is where the 17 comes in
+9/5		# halfdim also works with this for now, but I'm currently using min_lim7 for that
 44/25
