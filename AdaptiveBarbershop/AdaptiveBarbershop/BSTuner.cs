@@ -121,12 +121,13 @@ namespace AdaptiveBarbershop
             else if (distInHalfSteps >= 12)
                 distInHalfSteps -= 12;
 
+            Fraction interval = tuningTable[distInHalfSteps];
             // The microtonal distance between note and root in just intonation, counting upwards from root
-            double fullDist = 12 * halfStepSize * Math.Log2(tuningTable[distInHalfSteps].ToFactor());
+            double fullDist = 12 * halfStepSize * Math.Log2(interval.ToFactor());
 
             // Return how much note should deviate from equal temperament
             double indivBend = fullDist - distInHalfSteps * halfStepSize;
-            Console.WriteLine("Tuning note {0} with root {1} to value {2:0.0000}", note, root, indivBend);
+            Console.WriteLine("Tuning note {0} with root {1} to value {2:0.0000} using fraction {3}", note, root, indivBend, interval);
             return indivBend;
         }
 
@@ -345,7 +346,10 @@ namespace AdaptiveBarbershop
             }
             public Fraction(string input)
             {
-                string[] portions = input.Split('/');
+                // Comments can be added after a hashtag
+                string noComments = input.Split('#')[0];
+
+                string[] portions = noComments.Split('/');
 
                 if (!input.Contains('/') || portions.Length != 2)
                     throw new FormatException(string.Format("The fraction {0} can't be parsed", input));
@@ -359,6 +363,10 @@ namespace AdaptiveBarbershop
             public double ToFactor()
             {
                 return ((double)numerator / (double)denominator);
+            }
+            public override string ToString()
+            {
+                return numerator.ToString() + "/" + denominator.ToString();
             }
         }
     }
