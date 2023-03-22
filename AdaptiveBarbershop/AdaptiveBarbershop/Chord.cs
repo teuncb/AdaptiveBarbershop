@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Melanchall.DryWetMidi.Core;
+using Melanchall.DryWetMidi.Common;
 
 namespace AdaptiveBarbershop
 {
@@ -47,6 +49,28 @@ namespace AdaptiveBarbershop
             startTime = start;
             duration = int.Parse(portions[5]);
             masterBend = 0;
+        }
+        public List<MidiEvent> MidiMessages()
+            /// Not finished yet!
+        {
+            List<MidiEvent> events = new List<MidiEvent>();
+
+            // TODO add to different channels, not just 0
+            // TODO add pitch wheel message based indivBend and masterBend
+            for(int i = 0; i < notes.Length; i++)
+            {
+                if (notes[i].playing)
+                {
+                    // TODO don't add this if note is already playing (somehow, maybe outside this method)
+                    events.Add(new NoteOnEvent((SevenBitNumber)notes[i].midiKey, (SevenBitNumber)100));
+                    if (!notes[i].tied)
+                    {
+                        events.Add(new NoteOffEvent((SevenBitNumber)notes[i].midiKey, (SevenBitNumber)80));
+                    }
+                }
             }
+
+            return events;
+        }
     }
 }
