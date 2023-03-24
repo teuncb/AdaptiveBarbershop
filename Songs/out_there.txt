@@ -1,11 +1,11 @@
-EnM(en3t,bn3 ,en4t,g#4 )280
-Anm(en3t,cn4 ,en4t,an4 )280
-Anm(en3t,cn4 ,en4t,an4 )280
-EnM(en3t,bn3 ,en4t,g#4 )280
-EnM(en3t,bn3 ,en4t,g#4 )280
-En7(en3t,dn4 ,en4t,bn4 )280
-En7(en3t,dn4 ,en4t,bn4 )280
-Anm(en3t,cn4 ,en4t,an4 )280
+EnM(en3t,bn3 ,en4t,g#4 )240
+Anm(en3t,cn4 ,en4t,an4 )240
+Anm(en3t,cn4 ,en4t,an4 )240
+EnM(en3t,bn3 ,en4t,g#4 )240
+EnM(en3t,bn3 ,en4t,g#4 )240
+En7(en3t,dn4 ,en4t,bn4 )240
+En7(en3t,dn4 ,en4t,bn4 )240
+Anm(en3t,cn4 ,en4t,an4 )240
 Anm(en3 ,cn4 ,en4t,an4 )1920
 Cn7(a#3t,    ,en4t,    )480
 Cn7(a#3t,cn4t,en4t,    )480

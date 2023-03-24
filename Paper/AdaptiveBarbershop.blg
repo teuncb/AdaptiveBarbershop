@@ -1,0 +1,50 @@
+This is BibTeX, Version 0.99d
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: AdaptiveBarbershop.aux
+Reallocating 'name_of_file' (item size: 1) to 7 items.
+The style file: ieeetr.bst
+Reallocating 'name_of_file' (item size: 1) to 26 items.
+Database file #1: ../AdaptiveBarbershop.bib
+Warning--empty journal in barbershop_harmony_society_contest_2022
+You've used 9 entries,
+            1876 wiz_defined-function locations,
+            523 strings with 4623 characters,
+and the built_in function-call counts, 1501 in all, are:
+= -- 151
+> -- 30
+< -- 0
++ -- 16
+- -- 7
+* -- 80
+:= -- 210
+add.period$ -- 12
+call.type$ -- 9
+change.case$ -- 8
+chr.to.int$ -- 0
+cite$ -- 10
+duplicate$ -- 75
+empty$ -- 180
+format.name$ -- 7
+if$ -- 378
+int.to.chr$ -- 0
+int.to.str$ -- 9
+missing$ -- 6
+newline$ -- 34
+num.names$ -- 7
+pop$ -- 41
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 53
+stack$ -- 0
+substring$ -- 52
+swap$ -- 20
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 1
+while$ -- 14
+width$ -- 10
+write$ -- 80
+(There was 1 warning)

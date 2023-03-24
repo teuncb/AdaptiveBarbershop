@@ -7,10 +7,13 @@ namespace AdaptiveBarbershop
         static void Main(string[] args)
         {
             // FULL ALGORITHM TESTING CODE
-            Song outThere = new Song("../../../../../Songs/good_close_harmony.txt");
-            BSTuner tuner = new BSTuner();
+            string songName = "benedetti_pump";
+            Song song = new Song("../../../../../Songs/" + songName + ".txt");
+            BSTuner tuner = new BSTuner(tieRadius:0);
 
-            tuner.TuneSong(outThere);
+            song.WriteMidiFile(songName + "_untuned");
+            tuner.TuneSong(song);
+            song.WriteMidiFile(songName + "_tuned");
             Console.WriteLine("Success!?");
             Console.ReadLine();
 

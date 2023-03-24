@@ -257,6 +257,29 @@ namespace AdaptiveBarbershop
                 }
             }
         }
+        public static ushort MIDIBend(double masterBend, Note note)
+            /// Given a masterBend en indivBend, adds the two and maps it to the range in the actual MIDI format
+        {
+            double fullNoteBend = masterBend + note.indivBend;
+            // Map fullNoteBend to the range 0-16383
+            int midiNoteBend = (int)(8192 + Math.Round(fullNoteBend * 4096));
+
+            // MIDI maximum bend range is 2 half steps. If the bend exceeds that, just send a different MIDI noteID
+            // TODO this doesn't quite work yet
+            if (midiNoteBend >= 16383 || midiNoteBend <= -16383)
+            {
+                int distInHalfSteps = midiNoteBend / 8192;
+                note.midiNoteID += distInHalfSteps;
+                midiNoteBend -= distInHalfSteps * 8192;
+            }
+
+            // If midiNoteBend is outside this range AGAIN, then the algorithm wants to tune
+            // more than 8192 half steps up or down, that's not allowed.
+            if (midiNoteBend >= 16383 || midiNoteBend <= -16383)
+                throw new ArgumentOutOfRangeException("Too much bend!!");
+            
+            return (ushort)midiNoteBend;
+        }
 
         struct Range
         {

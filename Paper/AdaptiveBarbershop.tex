@@ -1,0 +1,129 @@
+\documentclass[a4paper]{article}
+
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage[noend]{algpseudocode}
+\usepackage{xcolor}
+
+\bibliographystyle{ieeetr}
+
+\title{An Adaptive Just Intonation Algorithm for Barbershop Quartets}
+\author{{\bf Teun Buwalda}\\t.c.buwalda@students.uu.nl\\6787886, Utrecht University}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+% TODO put a very short intro here. Start with "The piano is out of tune", make sure the first paragraph of 1.1 is a bit clearer (maybe completely move it here)
+The piano is out of tune; every \textit{musical interval} (i.e. distance between two tones) is slightly too small or too big in the standard tuning of the piano.\cite{van_de_craats_fis_1989} Music groups that have the possibility to, often attempt to tune their chords according to "just intonation" instead, adaptively retuning every note such that it works well in context. Barbershop quartets, for instance, explicitly try to achieve just intonation on every chord. However, when performers want to keep notes at the same pitch over different chords while tuning in just intonation, there is no unbiased answer to the question how exactly each note should be tuned.
+
+The current study tries to answer that specific question for barbershop quartets: {\it what adaptive tuning algorithm would a mathematically ideal barbershop quartet follow, given a score?}. In order to provide the necessary context for this question, the following paragraphs will expand upon the subjects of just intonation, adaptive just intonation algorithms and barbershop music.
+
+\subsection{Just Intonation}
+\label{intro_ji}
+
+In many musical contexts, {\it just intonation} is seen as the ideal method for tuning. Rather than predefining each tone's pitch, just intonation defines specific frequency ratios for each musical interval. The most common intervals are the octave (defined as $2:1$), the fifth ($3:2$) and the major third ($5:4$). For example, if an A is tuned at $220$ Hz, then an E a fifth above this A will be tuned at $220 \cdot \frac32 = 330$ Hz. The major seventh, which is also prevalent in many types of music, is defined as $7:4$. These ratios are drawn from the smallest intervals of the \textit{harmonic series}, which refers to the set of overtones that can be heard above nearly every sung, played or synthesised tone. When musical intervals follow these simple ratios, the overtones of different tones "lock together" and create a specific auditory experience that many musicians strive for.
+
+Sadly, it is mathematically impossible to devise a fixed tuning for a set of twelve tones such that each pair of tones always exactly follows one of the simple ratios from just intonation. A consequence of this fact is that it is also impossible to provide a "perfect" tuning for the piano. To prove this impossibility, suppose we want the major third to be equal to 4 semitones, as is the case in western music theory. Then the ratio between a low C and E on a piano should be $5:4$, as should the ratio between E and G$\sharp$ and the ratio between G$\sharp$ and a high C. Therefore, the ratio between the low C and G$\sharp$ should be $\frac54 \cdot \frac54 = \frac{25}{16}$ and the ratio between the low C and the high C should be $\frac{25}{16} \cdot \frac54 = \frac{125}{64}$. However, the two Cs are one octave apart and should therefore have a ratio of $\frac21$. These two ratios are not the same, which shows that it is impossible to devise a tuning system such that both major thirds and octaves are always in tune according to just intonation.
+
+Most modern music accepts the fact that just intonation cannot be achieved, using the tuning system of \textit{equal temperament} as a substitute. In twelve-tone equal temperament, the octave is divided into twelve equal divisions. Since the octave is defined by the frequency ratio $2:1$, this custom puts the smallest interval (the semitone) at exactly $\sqrt[12]{2}:1$. For example, if an A is tuned at $220$ Hz, then the lowest tone above this A, a B$\flat$, will be tuned at $220\cdot \frac{\sqrt[12]{2}}{1} \approx 233.08$ Hz.\cite{van_de_craats_fis_1989} Twelve-tone equal temperament works relatively well for some intervals, such as the fifth, which is only slightly too small compared to just intonation. On the contrary, intervals like the major third and the minor seventh are significantly smaller in just intonation than in equal temperament.
+
+\subsection{Adaptive Just Intonation Systems}
+\label{intro_adaptive_ji}
+
+% iets over violen, trombones en zang
+% iets over hermode, pivotuner en sethares
+% problemen met bv. zakken
+Although just intonation is impossible to achieve when all twelve tones have a fixed tuning, such as on an acoustic piano, it can be achieved when using instruments that can \textit{adaptively} tune specific notes. In other words, if a note can be tuned differently based on which other notes are playing, the strict mathematical ratios of just intonation can be followed. This idea is, for example, applied to ensembles with human voices, trombones or string instruments such as the violin, since all of those instruments can continuously change their pitch by ear.\cite{van_de_craats_fis_1989}
+
+Modern computational techniques also allow digital instruments to be tuned adaptively. Much research has been done into automatic \textit{adaptive tuning systems}: programs that take sets of musical notes as input, and return their respective tunings according to just intonation as output. Sethares (1994) approached the problem very generally by minimising a loss function based on a sound's dissonance curve.\cite{sethares_adaptive_1994} Løberg (2002) implemented a dynamic tuning system by the Norwegian composer Eivind Groven that dynamically chooses between 36 available tones to get just intervals.\cite{code_grovenmax_2002} Commercial software such as Hermode Tuning\cite{mohrlok_hermode_2003} and Pivotuner\cite{noauthor_pivotuner_nodate} can be integrated into music software to retune all played notes based on the sounding chord.
+
+However, even adaptive just intonation does not have a single algorithm that completely solves the mathematical problem of tuning. Choices need to be made with regards to optimisation of melodic intervals, held notes and tonal centre drift. Optimisation of melodic intervals means that the intervals within the melody follow equal temperament as much as possible. Optimisation of held notes means notes that keep sounding in different chords do not need to be dramatically retuned for each new chord. Tonal centre drift is a gradual lowering or heightening of the average tuning of notes, which is generally seen as undesirable.\cite{dougherty_choral_2004, barbershop_harmony_society_contest_2022} If held notes are allowed to retune freely, just intonation without pitch drift is possible if the melody always follows equal temperament and the other voices adapt to tune justly with the melody.\cite{dougherty_choral_2004} In contrast, the constraint of held notes staying at the same pitch between different chords causes problems.
+
+To illustrate the incompatibility of the held notes constraint with the other constraints, consider a C major triad (C-E-G) moving to an E major triad (E-G$\sharp$-B), with the E being held between the two chords. If the C is tuned according to equal temperament (e.g. $261.6$ Hz), then the E will have to be a bit lower than equal temperament in order to create the standard $3:2$ ratio of the major third (as $261.6 \cdot \frac32 = 392.4$ Hz, rather than $392.6$ Hz). If this lower E is held into the next chord, then the G$\sharp$ and B will also be tuned lower to tune justly with the E. Therefore, the overall tonal centre has moved slightly downwards ("flat"). This downwards shift shows that held notes and tonal centre drift cannot both be optimised at the same time.
+
+\subsection{Barbershop Music}
+\label{intro_bs}
+% barbershop in 1 alinea
+% barbershop en just intonation
+% de barbershopregels die just intonation moeilijker maken
+Barbershop is a distinct genre of four-part singing that is mostly prevalent in North America. The music is primarily sung in quartets, though larger choirs are also often formed, of which quartets form smaller subsets.\cite{garnett_ethics_1999} Barbershop quartets are easily recognisable and are sometimes used to exemplify old-fashioned American culture. However, Barbershop is also very specifically defined and has an active community that aims to preserve the genre according to its general definition. Some of the largest central events where Barbershop enthusiasts gather are competitions, where quartets are judged according to this specific definition.\cite{barbershop_harmony_society_contest_2022} In this paper, the Barbershop Harmony Society's definition of barbershop music and its Contest and Judging Handbook will often be cited as the main source of information about priorities within the genre.
+
+In this official definition, barbershop music is described as having four voices: tenor, lead, baritone and bass. The lead generally sings the melody, but exceptions can occur within a song. The melody is accompanied by mostly homorhythmic (in the same rhythm as the lead) harmonies in the other three voices. Chords generally do not get too complicated: most songs revolve around major and minor chords without many harmonic extensions. Additionally, the dominant seventh chord is often described as the most important chord in barbershop music.
+
+The Contest and Judging Handbook (page 7-2, paragraph II.A.) prescribes intonation in barbershop music as follows:
+\begin{quote}
+	Barbershop singers adjust pitches to achieve perfectly tuned chords, and yet sing a melodic line that remains true to the tonal center. Barbershop singers strive for more precise tuning than is possible with the fixed 12-tones- per-octave of the equally tempered scale of fixed-pitched instruments, such as the piano. Essentially, we use just intonation for harmonic tuning while remaining true to the established tonal center.\cite{barbershop_harmony_society_contest_2022}
+\end{quote}
+The above guideline describes just intonation as one of the key elements of barbershop music. Barbershop singers try to minimise "beats" in the sound of their harmonies, the auditory artefacts that appear when chords are not tuned justly. When quartets follow interval ratios as described in \ref{intro_ji}, the overtones of the different parts match and create a buzzing, unchanging auditory experience that is described as "lock and ring".
+
+However, very few barbershop quartets consistently achieve the high standard of just intonation.\cite{garnett_ethics_1999} The above quote immediately describes one of the major dilemmas that singers face when attempting to follow just intonation: tonal centre drift (see \ref{intro_adaptive_ji}). Besides attempting to maintain a constant tonal centre, quartets may also try to have the lead follow consistent melodic intervals similar to those on the piano, and refrain from moving held notes around too much.
+
+\subsection{Adaptive Just Intonation for Barbershop Music}
+\label{intro_aji_for_bs}
+% eerste alinea: wat ga ik doen (zonder "ik")
+% alinea over relevantie voor KI
+% laatste alinea: inhoud van dit paper
+This thesis project will answer two separate questions. Question A concerns the solution to barbershop quartets' problem: {\it what adaptive tuning algorithm would a mathematically ideal barbershop quartet follow, given a score?} In this first part of the thesis, I will construct an adaptive tuning system for barbershop music. This system will optimise the following criteria:
+\begin{enumerate}
+	\item maintain just intonation on every chord
+	\item account for the different roles of the four parts: specifically, the lead's intervals should mostly stick to 12-tone equal temperament
+	\item minimise (but not necessarily eliminate) retuning of held or repeating notes
+	\item minimise (but not necessarily eliminate) tonal centre drift
+\end{enumerate}
+In order to validate the algorithm, I will write a Results section in which I show how the algorithm accounts for these four criteria and where concessions need to be made in order to minimise conflicts between them.
+
+Research question B is: {\it can we implement the tuning system from question A so that it models the ideal barbershop quartet?} This second part of the project should result in a C$\sharp$ program that, given a sequence of chords, can play them back justly tuned and following the genre's limitations, possibly serving as a suggestion for performers.
+
+\subsection{Academic Context and Outline}
+This thesis project is part of the bachelor Kunstmatige Intelligentie at Utrecht University. The Utrecht University AI programmes focus on Human-Centered Artificial Intelligence (HCAI), rather than trying to keep up with the latest innovations in machine learning algorithms. HCAI targets to understand, reproduce and possible enhance human intelligence.\cite{noauthor_human-centered_2023} Modelling something specifically human such as barbershop music is inherently AI research, especially when trying to build an algorithm that is inspired by human performance, but performs better. This study involves a linguistic view of musical grammar, written as a computer science project, and analysed afterwards from a philosophical perspective. All three of those sciences are important areas of HCAI.
+
+Despite the extensive research into adaptive tuning systems, an algorithm that takes the limitations of barbershop quartets into account, such as the roles of the four different voices, has not yet been made. Adaptive tunings generally do not model human choirs. All previous work in adaptive just intonation takes a general approach, maximising dynamicity in trying to work for every performer, but they are not quite applicable to barbershop. Therefore, this thesis project adds a new dimension to the field of adaptive just intonation. At the same time, methods from Hermode Tuning and Pivotuner are important inspirations for the solution to research question A.
+
+% TODO ga ik wel echt ethiek doen?
+The following section will describe the exact methodology and further describe the algorithm's constraints. Sections \ref{algorithm} and \ref{implementation} will answer research questions A and B, respectively. Section \ref{results} will attempt to evaluate the algorithm by analysing results such as global pitch drift and particularly hard-to-tune passages. Section \ref{discussion} will then place this research in context of other literature about choirs, tuning and philosophy.
+
+\section{Methodology}
+\label{methodoloy}
+
+\section{Algorithm}
+\label{algorithm}
+
+\begin{algorithmic}[1]
+	\Procedure{SetMasterBend}{$\mathit{MB}_{i-1}, \mathit{Notes}_{i-1}, \mathit{Notes}_i, \mathit{tieRange}, \mathit{leadRange}$}
+	\State $\mathit{ties} \gets [$all notes in $\mathit{Notes}_{i-1}$ that have the tie property, ordered lead-bass-tenor-baritone$]$
+	
+	\State $\mathit{ranges} \gets [$for all tied notes, the range $\mathit{MB}_i$ could move into in order to satisfy its parameter$]$
+	\State $\mathit{ranges.Add}($the range in which $\mathit{MB}_i$ could move according to $\mathit{leadDiff})$
+	
+	\If{0 is within $\bigcap \mathit{ranges}$}
+	\State\Return{$\mathit{MB}_i \gets 0$}
+	\Else
+	\State $\mathit{currRange} \gets \mathit{ranges}[0]$
+	\ForAll{$\mathit{range} \; r \; in \;  \mathit{ranges}[1:]$}
+	\State $\mathit{currRange} \gets r \cap \mathit{currRange}$
+	\If{no intersection}
+	\State \Return{$\mathit{MB}_i \gets$ the closest number to $r$ within $\mathit{currRange}$}
+	\EndIf
+	\EndFor
+	
+	\State\Return{$\mathit{MB}_i \gets$ the closest number to 0 within $\mathit{currRange}$}
+	\EndIf
+	\EndProcedure
+\end{algorithmic}
+
+\section{C$\sharp$ Implementation}
+\label{implementation}
+
+\section{Results}
+\label{results}
+
+\section{Discussion}
+\label{discussion}
+
+
+
+
+\bibliography{AdaptiveBarbershop.bib}
+
+\end{document}

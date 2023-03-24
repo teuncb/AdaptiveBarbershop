@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using Melanchall.DryWetMidi.Core;
+using Melanchall.DryWetMidi.Common;
 
 namespace AdaptiveBarbershop
 {
@@ -10,6 +12,7 @@ namespace AdaptiveBarbershop
         public Chord[] chords;
 
         public Song(string path)
+            /// Initialises a Song from a path in the described song language
         {
             string[] lines = File.ReadAllLines(path);
             chords = new Chord[lines.Length];
@@ -41,6 +44,63 @@ namespace AdaptiveBarbershop
                     }
                 }
             }
+
+            for (int i = 0; i < chords[chords.Length - 1].notes.Length; i++)
+            {
+                if (chords[chords.Length - 1].notes[i].tied)
+                    throw new FormatException(string.Format("Last chord cannot have tied notes"));
+            }
+        }
+        public void WriteMidiFile(string fileName, bool overwriteFile = true)
+            /// Writes this entire song to a new MIDI file
+        {
+            string path = "../../../../../OutputMIDI/" + fileName + ".mid";
+            MIDISong().Write(path, overwriteFile);
+            Console.WriteLine("Successfully wrote a MIDI file to SongMidi/" + fileName + ".mid");
+        }
+
+        public MidiFile MIDISong(int tempo = 150000, int instrument = 72)
+        {
+            List<MidiEvent> events = new List<MidiEvent>();
+
+            // Make everyone sound like saxophones
+            List<MidiEvent> instrumentEvents = new List<MidiEvent>(){
+                new ProgramChangeEvent((SevenBitNumber)instrument) { Channel = (FourBitNumber)0 },
+                new ProgramChangeEvent((SevenBitNumber)instrument) { Channel = (FourBitNumber)1 },
+                new ProgramChangeEvent((SevenBitNumber)instrument) { Channel = (FourBitNumber)2 },
+                new ProgramChangeEvent((SevenBitNumber)instrument) { Channel = (FourBitNumber)3 }
+            };
+            events.AddRange(instrumentEvents);
+
+            // Initial call to MidiEvents: no notes are playing yet
+            (List<ChannelEvent> newEvents, int dt) = chords[0].MidiEvents(new bool[4] { false, false, false, false });
+            events.AddRange(newEvents);
+
+            // Add all pitch bend, note-on and note-off events from each chord to a big List
+            for(int i = 1; i < chords.Length; i++)
+            {
+                // The current chord needs to know which notes were tied in the previous chord
+                // The notes in previousTies don't get new note-on messages
+                bool[] previousTies = new bool[4];
+                for(int j = 0; j < previousTies.Length; j++)
+                {
+                    previousTies[j] = chords[i - 1].notes[j].tied;
+                }
+
+                (newEvents, dt) = chords[i].MidiEvents(previousTies, dt);
+                events.AddRange(newEvents);
+            }
+
+            MidiFile songFile = new MidiFile(
+                new TrackChunk(
+                    new SetTempoEvent(tempo)
+                    ),
+                new TrackChunk(
+                    events
+                    )
+                );
+
+            return songFile;
         }
     }
 }

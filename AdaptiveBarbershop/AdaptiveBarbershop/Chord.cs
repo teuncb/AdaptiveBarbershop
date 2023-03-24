@@ -50,27 +50,48 @@ namespace AdaptiveBarbershop
             duration = int.Parse(portions[5]);
             masterBend = 0;
         }
-        public List<MidiEvent> MidiMessages()
-            /// Not finished yet!
-        {
-            List<MidiEvent> events = new List<MidiEvent>();
 
-            // TODO add to different channels, not just 0
-            // TODO add pitch wheel message based indivBend and masterBend
-            for(int i = 0; i < notes.Length; i++)
-            {
-                if (notes[i].playing)
+        // TODO handling of DeltaTime for completely silent and completely tied chords
+        public (List<ChannelEvent>, int) MidiEvents(bool[] previousTies, int firstDeltaTime = 0)
+        {
+            if (previousTies.Length != 4)
+                throw new ArgumentException("previousTies didn't have length 4 when getting midi events, which is required");
+
+            List<ChannelEvent> events = new List<ChannelEvent>();
+
+            // Add pitch bends
+            events.Add(new PitchBendEvent(BSTuner.MIDIBend(masterBend, notes[0]))
+            { Channel = (FourBitNumber)0, DeltaTime = firstDeltaTime });
+            for (int i = 1; i < notes.Length; i++)
+                events.Add(new PitchBendEvent(BSTuner.MIDIBend(masterBend, notes[i])) 
+                { Channel = (FourBitNumber)i });
+
+            // Add note-on for new notes that aren't silent in this chord and aren't already playing
+            for (int i = 0; i < notes.Length; i++)
+                if (notes[i].playing && !previousTies[i])
+                    events.Add(new NoteOnEvent((SevenBitNumber)notes[i].midiNoteID, (SevenBitNumber)100) 
+                    { Channel = (FourBitNumber)i });
+
+            // Add note-off for non-tied notes that aren't silent in this chord
+            bool addedDeltaTime = false;
+            for (int i = 0; i < notes.Length; i++)
+                if (notes[i].playing && !notes[i].tied)
                 {
-                    // TODO don't add this if note is already playing (somehow, maybe outside this method)
-                    events.Add(new NoteOnEvent((SevenBitNumber)notes[i].midiKey, (SevenBitNumber)100));
-                    if (!notes[i].tied)
+                    if (addedDeltaTime)
                     {
-                        events.Add(new NoteOffEvent((SevenBitNumber)notes[i].midiKey, (SevenBitNumber)80));
+                        events.Add(new NoteOffEvent((SevenBitNumber)notes[i].midiNoteID, (SevenBitNumber)80)
+                        { Channel = (FourBitNumber)i });
+                    }
+                    else
+                    {
+                        events.Add(new NoteOffEvent((SevenBitNumber)notes[i].midiNoteID, (SevenBitNumber)80)
+                        { Channel = (FourBitNumber)i, DeltaTime = duration });
+                        addedDeltaTime = true;
                     }
                 }
-            }
 
-            return events;
+            // If no delta time could be added yet, pass it to the next Chord
+            return (events, addedDeltaTime?0:duration);
         }
     }
 }

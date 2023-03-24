@@ -1,0 +1,40 @@
+GnM(gn3 ,dn4t,gn4 ,    )480
+DnM(dn4 ,dn4 ,an4t,    )480
+CnM(cn4t,en4t,an4 ,    )480
+CnM(cn4 ,en4 ,gn4t,    )480
+GnM(gn3 ,dn4t,gn4 ,    )480
+DnM(dn4 ,dn4 ,an4t,    )480
+CnM(cn4t,en4t,an4 ,    )480
+CnM(cn4 ,en4 ,gn4t,    )480
+GnM(gn3 ,dn4t,gn4 ,    )480
+DnM(dn4 ,dn4 ,an4t,    )480
+CnM(cn4t,en4t,an4 ,    )480
+CnM(cn4 ,en4 ,gn4t,    )480
+GnM(gn3 ,dn4t,gn4 ,    )480
+DnM(dn4 ,dn4 ,an4t,    )480
+CnM(cn4t,en4t,an4 ,    )480
+CnM(cn4 ,en4 ,gn4t,    )480
+GnM(gn3 ,dn4t,gn4 ,    )480
+DnM(dn4 ,dn4 ,an4t,    )480
+CnM(cn4t,en4t,an4 ,    )480
+CnM(cn4 ,en4 ,gn4t,    )480
+GnM(gn3 ,dn4t,gn4 ,    )480
+DnM(dn4 ,dn4 ,an4t,    )480
+CnM(cn4t,en4t,an4 ,    )480
+CnM(cn4 ,en4 ,gn4t,    )480
+GnM(gn3 ,dn4t,gn4 ,    )480
+DnM(dn4 ,dn4 ,an4t,    )480
+CnM(cn4t,en4t,an4 ,    )480
+CnM(cn4 ,en4 ,gn4t,    )480
+GnM(gn3 ,dn4t,gn4 ,    )480
+DnM(dn4 ,dn4 ,an4t,    )480
+CnM(cn4t,en4t,an4 ,    )480
+CnM(cn4 ,en4 ,gn4t,    )480
+GnM(gn3 ,dn4t,gn4 ,    )480
+DnM(dn4 ,dn4 ,an4t,    )480
+CnM(cn4t,en4t,an4 ,    )480
+CnM(cn4 ,en4 ,gn4t,    )480
+GnM(gn3 ,dn4t,gn4 ,    )480
+DnM(dn4 ,dn4 ,an4t,    )480
+CnM(cn4t,en4t,an4 ,    )480
+CnM(cn4 ,en4 ,gn4 ,    )480

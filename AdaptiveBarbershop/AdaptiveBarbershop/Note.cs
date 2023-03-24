@@ -10,7 +10,7 @@ namespace AdaptiveBarbershop
         public int octave;
         public bool tied;
         public double indivBend;
-        public int midiKey; // TODO This isn't necessarily right after bending, when I'm implementing MIDI I should change this
+        public int midiNoteID; // TODO This isn't necessarily right after bending, when I'm implementing MIDI I should change this
 
         // Translates note names within the octave
         public static Dictionary<string, int> noteNames = new Dictionary<string, int>
@@ -33,17 +33,18 @@ namespace AdaptiveBarbershop
             }
 
             playing = true;
-            midiKey = 88;
+            midiNoteID = 88;
 
             Console.WriteLine("Building note from input string " + input);
             noteNum = noteNames[input.Substring(0, 2)];
             octave = int.Parse(input.Substring(2, 1));
-            // Lowest MIDI key is A0, which has octave 0 and noteID 9
-            midiKey = octave * 12 + noteNum - 9;
+            // Lowest MIDI key on a piano is A0, which has noteNum 9. In MIDI, A0 has noteID 21.
+            midiNoteID = (octave + 1) * 12 + noteNum - 9;
+            Console.WriteLine(string.Format("note ID turned out to be {0}", midiNoteID));
 
-            if(midiKey < 0 || midiKey > 88)
+            if(midiNoteID < 21 || midiNoteID > 108)
             {
-                throw new Exception(string.Format("The note \"{0}\" corresponds to MIDI key {1}, which is out of range", input, midiKey));
+                throw new Exception(string.Format("The note \"{0}\" corresponds to MIDI key {1}, which is out of range", input, midiNoteID));
             }
 
             switch (input[3])
