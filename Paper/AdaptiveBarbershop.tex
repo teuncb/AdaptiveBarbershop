@@ -97,35 +97,59 @@ The following section will describe the exact methodology and further describe t
 
 \section{Methodology}
 \label{methodoloy}
+% input (language, including chords)
+  % fractions input
+% output: MIDI, but also analysis
 
 \section{Algorithm}
 \label{algorithm}
+% indivBend vs masterBend
+% describe vertical step
+% describe horizontal step
+% parameters
+This section will describe the tuning algorithm described by this paper. The algorithm consists of a vertical step and a horizontal step. The vertical step satisfies the just intonation constraints, whereas the horizontal step satisfies the other three constraints. The vertical step is a relatively standard procedure of just intonation, whereas the horizontal step is a completely new proposal. Figure \ref{fig:algo_outline}
 
-\begin{algorithmic}[1]
-	\Procedure{SetMasterBend}{$\mathit{MB}_{i-1}, \mathit{Notes}_{i-1}, \mathit{Notes}_i, \mathit{tieRange}, \mathit{leadRange}$}
-	\State $\mathit{ties} \gets [$all notes in $\mathit{Notes}_{i-1}$ that have the tie property, ordered lead-bass-tenor-baritone$]$
-	
-	\State $\mathit{ranges} \gets [$for all tied notes, the range $\mathit{MB}_i$ could move into in order to satisfy its parameter$]$
-	\State $\mathit{ranges.Add}($the range in which $\mathit{MB}_i$ could move according to $\mathit{leadDiff})$
-	
-	\If{0 is within $\bigcap \mathit{ranges}$}
-	\State\Return{$\mathit{MB}_i \gets 0$}
-	\Else
-	\State $\mathit{currRange} \gets \mathit{ranges}[0]$
-	\ForAll{$\mathit{range} \; r \; in \;  \mathit{ranges}[1:]$}
-	\State $\mathit{currRange} \gets r \cap \mathit{currRange}$
-	\If{no intersection}
-	\State \Return{$\mathit{MB}_i \gets$ the closest number to $r$ within $\mathit{currRange}$}
-	\EndIf
-	\EndFor
-	
-	\State\Return{$\mathit{MB}_i \gets$ the closest number to 0 within $\mathit{currRange}$}
-	\EndIf
-	\EndProcedure
-\end{algorithmic}
+\begin{figure}
+	\includegraphics[scale=0.35]{Figures/algo_outline.pdf}
+	\caption{A basic view of the algorithm.}
+	\label{fig:algo_outline}
+\end{figure}
+
+The algorithm distinguishes between two levels of tuning: \textit{individual bend} and \textit{master bend}. The individual bend describes how much the notes within a chord differ from each other and is determined in the vertical step of the algorithm. A note's individual bend is only relative to the tuning of the other three notes in the chord. On the other hand, the master bend is used to move the entire chord's tuning up or down and is determined in the horizontal step. A note's pitch is ultimately calculated by adding its individual bend to the chord's master bend. Importantly, a note's individual bend never changes after the vertical step of the algorithm is done, making sure the notes of one chord always stay justly tuned with one another.
+
+The vertical step determines each note's individual bend using just intonation intervals. The chord root is always set to 0 (again, since these are relative values, that does not actually mean the root will be tuned to the regular ET value). The bend values for the other playing notes are decided using a given set of interval values based on fractions relative to the chord root. These fractions are taken from simple ratios in the harmonic series. To illustrate: the dominant seventh chord is usually described with a $4:5:6:7$ ratio between its chord tones. Therefore, in an A dominant seventh chord (A-C$\sharp$-E-G), the G's frequency will be tuned to be $\frac74$ times the A's frequency. On the other hand, a half-diminished chord is usually described with a $5:6:7:9$ ratio, so in an A half dimished chord (A-C-E$\flat$-G), the G will be equal to $\frac95$ times the A.
+
+The horizontal step moves all chord notes around to satisfy the lead, tie and drift constraints.
 
 \section{C$\sharp$ Implementation}
 \label{implementation}
+
+\begin{figure}
+	\begin{algorithmic}[1]
+		\Procedure{SetMasterBend}{$\mathit{MB}_{i-1}, \mathit{Notes}_{i-1}, \mathit{Notes}_i, \mathit{tieRange}, \mathit{leadRange}$}
+		\State $\mathit{ties} \gets [$all notes in $\mathit{Notes}_{i-1}$ that have the tie property, ordered lead-bass-tenor-baritone$]$
+		
+		\State $\mathit{ranges} \gets [$for all tied notes, the range $\mathit{MB}_i$ could move into in order to satisfy its parameter$]$
+		\State $\mathit{ranges.Add}($the range in which $\mathit{MB}_i$ could move according to $\mathit{leadDiff})$
+		
+		\If{0 is within $\bigcap \mathit{ranges}$}
+		\State\Return{$\mathit{MB}_i \gets 0$}
+		\Else
+		\State $\mathit{currRange} \gets \mathit{ranges}[0]$
+		\ForAll{$\mathit{range} \; r \; in \;  \mathit{ranges}[1:]$}
+		\State $\mathit{currRange} \gets r \cap \mathit{currRange}$
+		\If{no intersection}
+		\State \Return{$\mathit{MB}_i \gets$ the closest number to $r$ within $\mathit{currRange}$}
+		\EndIf
+		\EndFor
+		
+		\State\Return{$\mathit{MB}_i \gets$ the closest number to 0 within $\mathit{currRange}$}
+		\EndIf
+		\EndProcedure
+	\end{algorithmic}
+	\caption{Pseudocode for the horizontal step.}
+	\label{fig:pseudocodeH}
+\end{figure}
 
 \section{Results}
 \label{results}

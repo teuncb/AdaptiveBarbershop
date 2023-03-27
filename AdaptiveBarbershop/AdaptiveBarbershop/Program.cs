@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace AdaptiveBarbershop
 {
@@ -7,9 +8,9 @@ namespace AdaptiveBarbershop
         static void Main(string[] args)
         {
             // FULL ALGORITHM TESTING CODE
-            string songName = "benedetti_pump";
+            string songName = "out_there";
             Song song = new Song("../../../../../Songs/" + songName + ".txt");
-            BSTuner tuner = new BSTuner(tieRadius:0);
+            BSTuner tuner = new BSTuner(tieRadius: 0);
 
             song.WriteMidiFile(songName + "_untuned");
             tuner.TuneSong(song);

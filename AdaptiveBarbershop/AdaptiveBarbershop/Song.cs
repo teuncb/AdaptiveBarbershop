@@ -10,6 +10,7 @@ namespace AdaptiveBarbershop
     class Song
     {
         public Chord[] chords;
+        public double[] diffs;
 
         public Song(string path)
             /// Initialises a Song from a path in the described song language

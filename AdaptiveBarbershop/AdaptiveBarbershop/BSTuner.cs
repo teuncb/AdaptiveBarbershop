@@ -49,8 +49,10 @@ namespace AdaptiveBarbershop
         }
 
         // Master method for the tuning algorithm: tunes an entire song
-        public void TuneSong(Song song)
+        public void TuneSong(Song song, bool analyze = true)
         {
+            song.diffs = new double[song.chords.Length];
+
             // Carry out the vertical step for each chord
             for (int i = 0; i < song.chords.Length; i++)
             {
@@ -64,8 +66,34 @@ namespace AdaptiveBarbershop
             for (int i = 1; i < song.chords.Length; i++)
             {
                 double mb = SetMasterBend(song.chords[i - 1], song.chords[i]);
+                song.diffs[i] = mb - song.chords[i - 1].masterBend;
                 Console.WriteLine("Set master bend for chord {0} to {1:0.0000}", i, mb);
             }
+
+            if (analyze)
+                AnalyzeTuning(song);
+        }
+
+        public void AnalyzeTuning(Song song)
+            /// Gives some overall statistics on how tuning this song went.
+        {
+            Console.WriteLine("--------------------------------");
+            Console.WriteLine("The song was successfully tuned. Here are some fun facts:");
+            Console.WriteLine("Overall pitch drift: {0}", song.chords[song.chords.Length - 1].masterBend);
+
+            double maxDiff = 0;
+            int maxIdx = 0;
+            for(int i = 0; i < song.diffs.Length; i++)
+            {
+                if (Math.Abs(song.diffs[i]) > Math.Abs(maxDiff))
+                {
+                    maxDiff = song.diffs[i];
+                    maxIdx = i;
+                }
+
+            }
+            Console.WriteLine("Most dramatic pitch drift moment: {0:0.0000} when going from chord {1} ({2}) to chord {3} ({4})", 
+                maxDiff, maxIdx - 1, song.chords[maxIdx - 1].ToString(), maxIdx, song.chords[maxIdx].ToString());
         }
 
         // Given a bend range as a fraction of a half step, randomly assign individual bends to each note in a chord

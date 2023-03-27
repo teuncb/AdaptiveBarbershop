@@ -13,6 +13,7 @@ namespace AdaptiveBarbershop
         public int duration;
         public int root;
         public char chordType; // TODO meer commentaar
+        public string fullName;
 
         private static HashSet<char> chordTypes = new HashSet<char>() { 'M', 'm', '7', 'o', '0' };
 
@@ -34,6 +35,7 @@ namespace AdaptiveBarbershop
             }
 
             // The chord type is stored in the same way as the input language: M, m, 7, o or 0
+            fullName = portions[0];
             chordType = portions[0][2];
             if (!chordTypes.Contains(chordType))
                 throw new ArgumentException(
@@ -92,6 +94,11 @@ namespace AdaptiveBarbershop
 
             // If no delta time could be added yet, pass it to the next Chord
             return (events, addedDeltaTime?0:duration);
+        }
+
+        public override string ToString()
+        {
+            return fullName;
         }
     }
 }
