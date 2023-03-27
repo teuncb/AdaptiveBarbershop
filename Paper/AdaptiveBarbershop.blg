@@ -3,12 +3,12 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: AdaptiveBarbershop.aux
 Reallocating 'name_of_file' (item size: 1) to 7 items.
 The style file: ieeetr.bst
-Reallocating 'name_of_file' (item size: 1) to 26 items.
-Database file #1: ../AdaptiveBarbershop.bib
+Reallocating 'name_of_file' (item size: 1) to 23 items.
+Database file #1: AdaptiveBarbershop.bib
 Warning--empty journal in barbershop_harmony_society_contest_2022
 You've used 9 entries,
             1876 wiz_defined-function locations,
-            523 strings with 4623 characters,
+            523 strings with 4620 characters,
 and the built_in function-call counts, 1501 in all, are:
 = -- 151
 > -- 30
