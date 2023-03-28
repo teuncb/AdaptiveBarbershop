@@ -51,7 +51,11 @@ namespace AdaptiveBarbershop
         // Master method for the tuning algorithm: tunes an entire song
         public void TuneSong(Song song, bool analyze = true)
         {
-            song.diffs = new double[song.chords.Length];
+            if (analyze)
+            {
+                song.drifts = new double[song.chords.Length];
+                song.maxTieDiffs = new (double, int, Note)[song.chords.Length];
+            }
 
             // Carry out the vertical step for each chord
             for (int i = 0; i < song.chords.Length; i++)
@@ -66,7 +70,24 @@ namespace AdaptiveBarbershop
             for (int i = 1; i < song.chords.Length; i++)
             {
                 double mb = SetMasterBend(song.chords[i - 1], song.chords[i]);
-                song.diffs[i] = mb - song.chords[i - 1].masterBend;
+                if (analyze)
+                {
+                    song.drifts[i] = mb - song.chords[i - 1].masterBend;
+
+                    // Find the biggest tie difference in this chord
+                    for (int j = 0; j < 4; j++)
+                    {
+                        Note oldNote = song.chords[i - 1].notes[j];
+                        Note newNote = song.chords[i].notes[j];
+                        double bendDiff = (oldNote.indivBend + song.chords[i - 1].masterBend) - (newNote.indivBend + song.chords[i].masterBend);
+
+                        if (oldNote.tied && 
+                            (Math.Abs(bendDiff) > Math.Abs(song.maxTieDiffs[i].Item1)))
+                        {
+                            song.maxTieDiffs[i] = (bendDiff, i, newNote);
+                        }
+                    }
+                }
                 Console.WriteLine("Set master bend for chord {0} to {1:0.0000}", i, mb);
             }
 
@@ -81,19 +102,33 @@ namespace AdaptiveBarbershop
             Console.WriteLine("The song was successfully tuned. Here are some fun facts:");
             Console.WriteLine("Overall pitch drift: {0}", song.chords[song.chords.Length - 1].masterBend);
 
-            double maxDiff = 0;
+            double max = 0;
             int maxIdx = 0;
-            for(int i = 0; i < song.diffs.Length; i++)
+            for(int i = 0; i < song.drifts.Length; i++)
             {
-                if (Math.Abs(song.diffs[i]) > Math.Abs(maxDiff))
+                if (Math.Abs(song.drifts[i]) > Math.Abs(max))
                 {
-                    maxDiff = song.diffs[i];
+                    max = song.drifts[i];
                     maxIdx = i;
                 }
-
             }
             Console.WriteLine("Most dramatic pitch drift moment: {0:0.0000} when going from chord {1} ({2}) to chord {3} ({4})", 
-                maxDiff, maxIdx - 1, song.chords[maxIdx - 1].ToString(), maxIdx, song.chords[maxIdx].ToString());
+                max, maxIdx - 1, song.chords[maxIdx - 1], maxIdx, song.chords[maxIdx]);
+
+            max = 0;
+            maxIdx = 0;
+            Note maxNote = null;
+            foreach((double diff, int i, Note n) in song.maxTieDiffs)
+            {
+                if (Math.Abs(diff) > Math.Abs(max))
+                {
+                    max = diff;
+                    maxIdx = i;
+                    maxNote = n;
+                }
+            }
+            Console.WriteLine("Most dramatic tie change: {0:0.0000} in the note {1} from chord {2} ({3}) to chord {4} ({5})",
+                max, maxNote.noteNum, maxIdx - 1, song.chords[maxIdx - 1], maxIdx, song.chords[maxIdx]);
         }
 
         // Given a bend range as a fraction of a half step, randomly assign individual bends to each note in a chord
