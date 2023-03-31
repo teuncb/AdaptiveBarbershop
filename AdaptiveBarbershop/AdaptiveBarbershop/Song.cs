@@ -56,9 +56,10 @@ namespace AdaptiveBarbershop
         public void WriteMidiFile(string fileName, bool overwriteFile = true)
             /// Writes this entire song to a new MIDI file
         {
-            string path = "../../../../../OutputMIDI/" + fileName + ".mid";
+            string folder = "OutputMidi/";
+            string path = "../../../../../" + folder + fileName + ".mid";
             MIDISong().Write(path, overwriteFile);
-            Console.WriteLine("Successfully wrote a MIDI file to SongMidi/" + fileName + ".mid");
+            Console.WriteLine("Successfully wrote a MIDI file to " + folder + fileName + ".mid");
         }
 
         public MidiFile MIDISong(int tempo = 150000, int instrument = 72)

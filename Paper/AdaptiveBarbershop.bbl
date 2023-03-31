@@ -1,4 +1,4 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
 \bibitem{van_de_craats_fis_1989}
 J.~Van~de Craats, {\em De fis van {Euler}. {Een} nieuwe visie op de muziek van
@@ -36,5 +36,9 @@ L.~Garnett, ``Ethics and aesthetics: the social theory of barbershop harmony,''
 \bibitem{noauthor_human-centered_2023}
 ``Human-centered {Artificial} {Intelligence} - {Universiteit} {Utrecht},'' Feb.
   2023.
+
+\bibitem{midi_manufacturers_association_complete_2014}
+{MIDI Manufacturers Association}, ``The {Complete} {MIDI} 1.0 {Detailed}
+  {Specification},'' 2014.
 
 \end{thebibliography}

@@ -127,7 +127,12 @@ namespace AdaptiveBarbershop
                     maxNote = n;
                 }
             }
-            Console.WriteLine("Most dramatic tie change: {0:0.0000} in the note {1} from chord {2} ({3}) to chord {4} ({5})",
+            if(maxNote is null)
+            {
+                Console.WriteLine("Not a single tied note had to retune, great!");
+            }
+            else
+                Console.WriteLine("Most dramatic tie change: {0:0.0000} in the note {1} from chord {2} ({3}) to chord {4} ({5})",
                 max, maxNote.noteNum, maxIdx - 1, song.chords[maxIdx - 1], maxIdx, song.chords[maxIdx]);
         }
 
@@ -323,6 +328,9 @@ namespace AdaptiveBarbershop
         public static ushort MIDIBend(double masterBend, Note note)
             /// Given a masterBend en indivBend, adds the two and maps it to the range in the actual MIDI format
         {
+            if (!note.playing)
+                return 0;
+
             double fullNoteBend = masterBend + note.indivBend;
             // Map fullNoteBend to the range 0-16383
             int midiNoteBend = (int)(8192 + Math.Round(fullNoteBend * 4096));
@@ -333,7 +341,7 @@ namespace AdaptiveBarbershop
             {
                 int distInHalfSteps = midiNoteBend / 8192;
                 note.midiNoteID += distInHalfSteps;
-                midiNoteBend -= distInHalfSteps * 8192;
+                midiNoteBend -= (distInHalfSteps - 1) * 8192;
             }
 
             // If midiNoteBend is outside this range AGAIN, then the algorithm wants to tune

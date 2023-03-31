@@ -34,8 +34,8 @@
      inkscape:snap-text-baseline="true"
      inkscape:snap-bbox="false"
      inkscape:zoom="2"
-     inkscape:cx="1005.75"
-     inkscape:cy="178.25"
+     inkscape:cx="964.25"
+     inkscape:cy="45.25"
      inkscape:window-width="1920"
      inkscape:window-height="1001"
      inkscape:window-x="-9"
@@ -749,49 +749,49 @@
     <text
        xml:space="preserve"
        style="font-size:5.29167px;line-height:1.25;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, Normal';stroke-width:0.264583"
-       x="269.52972"
+       x="260.53375"
        y="20.495054"
        id="text1526"><tspan
          sodipodi:role="line"
          id="tspan1524"
          style="font-style:italic;font-size:5.29167px;stroke-width:0.264583"
-         x="269.52972"
-         y="20.495054">within 10c</tspan></text>
+         x="260.53375"
+         y="20.495054">lead: within 10c</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Mend)"
-       d="m 292.53169,18.535984 6.586,0.610101"
+       d="m 295.30982,18.502911 3.80787,0.643174"
        id="path8027"
        sodipodi:nodetypes="cc" />
     <text
        xml:space="preserve"
        style="font-size:5.29167px;line-height:1.25;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, Normal';stroke-width:0.264583"
-       x="265.75943"
+       x="260.46768"
        y="9.0187521"
        id="text9100"><tspan
          sodipodi:role="line"
          id="tspan9098"
          style="font-style:italic;font-size:5.29167px;stroke-width:0.264583"
-         x="265.75943"
-         y="9.0187521">within 3c</tspan></text>
+         x="260.46768"
+         y="9.0187521">tie: within 3c</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Mend)"
-       d="M 286.23776,6.8176028 298.1024,5.7057312"
+       d="M 289.41827,7.706274 298.1024,5.7057312"
        id="path9962"
        sodipodi:nodetypes="cc" />
     <text
        xml:space="preserve"
        style="font-size:5.29167px;line-height:1.25;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, Normal';stroke-width:0.264583"
-       x="289.91718"
+       x="285.1546"
        y="67.601456"
        id="text14610"><tspan
          sodipodi:role="line"
          id="tspan14608"
          style="font-style:italic;font-size:5.29167px;stroke-width:0.264583"
-         x="289.91718"
-         y="67.601456">closest possible to 0</tspan></text>
+         x="285.1546"
+         y="67.601456">drift: closest possible to 0</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Mend)"
-       d="m 321.41575,64.737527 1.75488,-1.223196 3.15803,-2.201231 0.6436,-0.448606"
+       d="m 320.35741,64.737527 1.75488,-1.223196 3.15803,-2.201231 0.6436,-0.448606"
        id="path17028"
        sodipodi:nodetypes="cccc" />
     <text

@@ -6,36 +6,36 @@ The style file: ieeetr.bst
 Reallocating 'name_of_file' (item size: 1) to 23 items.
 Database file #1: AdaptiveBarbershop.bib
 Warning--empty journal in barbershop_harmony_society_contest_2022
-You've used 9 entries,
+You've used 10 entries,
             1876 wiz_defined-function locations,
-            523 strings with 4620 characters,
-and the built_in function-call counts, 1501 in all, are:
-= -- 151
-> -- 30
+            527 strings with 4752 characters,
+and the built_in function-call counts, 1624 in all, are:
+= -- 161
+> -- 34
 < -- 0
-+ -- 16
-- -- 7
-* -- 80
-:= -- 210
-add.period$ -- 12
-call.type$ -- 9
-change.case$ -- 8
++ -- 18
+- -- 8
+* -- 84
+:= -- 229
+add.period$ -- 13
+call.type$ -- 10
+change.case$ -- 9
 chr.to.int$ -- 0
-cite$ -- 10
-duplicate$ -- 75
-empty$ -- 180
-format.name$ -- 7
-if$ -- 378
+cite$ -- 11
+duplicate$ -- 79
+empty$ -- 198
+format.name$ -- 8
+if$ -- 409
 int.to.chr$ -- 0
-int.to.str$ -- 9
+int.to.str$ -- 10
 missing$ -- 6
-newline$ -- 34
-num.names$ -- 7
-pop$ -- 41
+newline$ -- 37
+num.names$ -- 8
+pop$ -- 48
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 53
+skip$ -- 56
 stack$ -- 0
 substring$ -- 52
 swap$ -- 20
@@ -44,7 +44,7 @@ text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
 warning$ -- 1
-while$ -- 14
-width$ -- 10
-write$ -- 80
+while$ -- 15
+width$ -- 12
+write$ -- 87
 (There was 1 warning)

@@ -6,6 +6,7 @@
 \usepackage{xcolor}
 \usepackage{graphicx}
 \usepackage{caption}
+\usepackage[toc,page]{appendix}
 
 \bibliographystyle{ieeetr}
 
@@ -19,7 +20,7 @@
 % TODO put a very short intro here. Start with "The piano is out of tune", make sure the first paragraph of 1.1 is a bit clearer (maybe completely move it here)
 The piano is out of tune; every \textit{musical interval} (i.e. distance between two tones) is slightly too small or too big in the standard tuning of the piano.\cite{van_de_craats_fis_1989} Music groups that have the possibility to, often attempt to tune their chords according to "just intonation" instead, adaptively retuning every note such that it works well in context. Barbershop quartets, for instance, explicitly try to achieve just intonation on every chord. However, when performers want to keep notes at the same pitch over different chords while tuning in just intonation, there is no unbiased answer to the question how exactly each note should be tuned.
 
-The current study tries to answer that specific question for barbershop quartets: {\it what adaptive tuning algorithm would a mathematically ideal barbershop quartet follow, given a score?}. In order to provide the necessary context for this question, the following paragraphs will expand upon the subjects of just intonation, adaptive just intonation algorithms and barbershop music.
+The current study tries to answer that specific question for barbershop quartets: {\it what adaptive tuning algorithm would a mathematically ideal barbershop quartet follow, given a score?} (research question A). Afterwards, this study will implement this algorithm in order to answer research question B: {\it can we implement the tuning system from question A so that it models the ideal barbershop quartet?} In order to provide the necessary context for this question, the following paragraphs will expand upon the subjects of just intonation, adaptive just intonation algorithms and barbershop music.
 
 \subsection{Just Intonation}
 \label{intro_ji}
@@ -36,9 +37,9 @@ Sadly, it is mathematically impossible to devise a fixed tuning for a set of twe
 \end{figure}
 
 % TODO: cents calculation
-Most modern music accepts the fact that just intonation cannot be achieved, using the tuning system of \textit{equal temperament} (ET) as a substitute. In twelve-tone equal temperament, the octave is divided into twelve equal divisions. Since the octave is defined by the frequency ratio $2:1$, this custom puts the smallest interval (the semitone) at exactly $\sqrt[12]{2}:1$. For example, if an A is tuned at $220$ Hz, then the lowest tone above this A, a B$\flat$, will be tuned at $220\cdot \frac{\sqrt[12]{2}}{1} \approx 233.08$ Hz.\cite{van_de_craats_fis_1989} Twelve-tone equal temperament works relatively well for some intervals, such as the fifth, which is only slightly too small compared to just intonation. On the contrary, intervals like the major third and the minor seventh are significantly smaller in just intonation than in equal temperament. Figure \ref{fig:121TET} shows the standard tuning in equal temperament for a part of the piano keyboard. 
+Most modern music accepts the fact that just intonation cannot be achieved, using the tuning system of \textit{equal temperament} as a substitute. In twelve-tone equal temperament, the octave is divided into twelve equal divisions. Since the octave is defined by the frequency ratio $2:1$, this custom puts the smallest interval (the semitone) at exactly $\sqrt[12]{2}:1$. For example, if an A is tuned at $220$ Hz, then the lowest tone above this A, a B$\flat$, will be tuned at $220\cdot \frac{\sqrt[12]{2}}{1} \approx 233.08$ Hz.\cite{van_de_craats_fis_1989} Twelve-tone equal temperament works relatively well for some intervals, such as the fifth, which is only slightly too small compared to just intonation. On the contrary, intervals like the major third and the minor seventh are significantly smaller in just intonation than in equal temperament. Figure \ref{fig:121TET} shows the standard tuning in equal temperament for a part of the piano keyboard. 
 
-When talking about the difference between just intonation and equal temperament, the \textit{cent} interval is often used as a unit. 1 cent is defined as $\frac{1}{100}$ of a semitone in ET, meaning it has a frequency ratio of $\sqrt[1200]{2}:1$. A justly tuned major third, for example, is 14 cents lower than a major third in equal temperament (Figure \ref{fig:thirdsproof}).
+When talking about the difference between just intonation and 12-tone equal temperament, the \textit{cent} interval is often used as a unit. 1 cent is defined as $\frac{1}{100}$ of a semitone in equal temperament, meaning it has a frequency ratio of $\sqrt[1200]{2}:1$. A justly tuned major third, for example, is 14 cents lower than a major third in equal temperament (Figure \ref{fig:thirdsproof}).
 
 \subsection{Adaptive Just Intonation Systems}
 \label{intro_adaptive_ji}
@@ -76,14 +77,7 @@ However, very few barbershop quartets consistently achieve the high standard of 
 % eerste alinea: wat ga ik doen (zonder "ik")
 % alinea over relevantie voor KI
 % laatste alinea: inhoud van dit paper
-This thesis project will answer two separate questions. Question A concerns the solution to barbershop quartets' problem: {\it what adaptive tuning algorithm would a mathematically ideal barbershop quartet follow, given a score?} In this first part of the thesis, I will construct an adaptive tuning system for barbershop music. This system will optimise the following criteria:
-\begin{enumerate}
-	\item maintain just intonation on every chord
-	\item account for the different roles of the four parts: specifically, the lead's intervals should mostly stick to 12-tone equal temperament
-	\item minimise (but not necessarily eliminate) retuning of held or repeating notes
-	\item minimise (but not necessarily eliminate) tonal centre drift
-\end{enumerate}
-In order to validate the algorithm, I will write a Results section in which I show how the algorithm accounts for these four criteria and where concessions need to be made in order to minimise conflicts between them.
+This thesis project will answer two separate questions. Question A concerns the solution to barbershop quartets' problem: {\it what adaptive tuning algorithm would a mathematically ideal barbershop quartet follow, given a score?} In this first part of the thesis, I will construct an adaptive tuning system for barbershop music. It will optimise four criteria (outlined in \ref{methodoloy}) which are important to the genre. In order to validate the algorithm, I will write a Results section in which I show how the algorithm accounts for these four criteria and where concessions need to be made in order to minimise conflicts between them.
 
 Research question B is: {\it can we implement the tuning system from question A so that it models the ideal barbershop quartet?} This second part of the project should result in a C$\sharp$ program that, given a sequence of chords, can play them back justly tuned and following the genre's limitations, possibly serving as a suggestion for performers.
 
@@ -97,9 +91,24 @@ The following section will describe the exact methodology and further describe t
 
 \section{Methodology}
 \label{methodoloy}
+% Nog eens een algemene omschrijving van wat het algoritme moet doen
 % input (language, including chords)
   % fractions input
 % output: MIDI, but also analysis
+This paper will propose an algorithm that adaptively tunes barbershop scores to just intonation. Figure \ref{fig:pipeline} shows the pipeline that the algorithm should follow. The tuning system will optimise the following criteria:
+\begin{enumerate}
+	\item maintain just intonation on every chord [\textit{just intonation constraint}]
+	\item account for the different roles of the four parts: specifically, the lead's intervals should mostly stick to 12-tone equal temperament [\textit{lead constraint}]
+	\item minimise (but not necessarily eliminate) retuning of held notes [\textit{tie constraint}]
+	\item minimise (but not necessarily eliminate) tonal centre drift [\textit{drift constraint}]
+\end{enumerate}
+
+The input of the algorithm consists of \verb+.txt+ files that describe a barbershop score. The \verb+.txt+ files should be written using a specific, newly-defined language that contains information about note pitches, harmonies, tied notes and durations. This language is described in Appendix \ref{input_language}. Importantly, the input should have already split the score into \textit{Chords}, which in this case are periods of time where none of the notes changes. A new Chord begins any time one of the four voices stops singing, starts singing or moves to a different pitch. Figure \ref{fig:chords} visualises such a split score.
+
+Because of this newly-defined language, a parser must be programmed to convert the input \verb+.txt+ files into the program's internal data structure. Conversion from original sheet music to the input language is, for now, a human job.
+
+The output of the algorithm consists of a MIDI file\cite{midi_manufacturers_association_complete_2014} and some general statistics such as how much the song had to drift in general and which chords caused the most dramatic retunings. The MIDI files mostly contain the original notes from the score, now with extra pitch bend messages. Section \ref{implementation} will describe the MIDI conversion in further detail.
+
 
 \section{Algorithm}
 \label{algorithm}
@@ -107,22 +116,30 @@ The following section will describe the exact methodology and further describe t
 % describe vertical step
 % describe horizontal step
 % parameters
-This section will describe the tuning algorithm described by this paper. The algorithm consists of a vertical step and a horizontal step. The vertical step satisfies the just intonation constraints, whereas the horizontal step satisfies the other three constraints. The vertical step is a relatively standard procedure of just intonation, whereas the horizontal step is a completely new proposal. Figure \ref{fig:algo_outline}
+This section will describe the tuning algorithm proposed by this paper, thereby answering research question A: {\it what adaptive tuning algorithm would a mathematically ideal barbershop quartet follow, given a score?}. The algorithm returns a set of bend values that prescribe how much each note in the song should deviate from 12-tone equal temperament. The algorithm consists of a vertical step and a horizontal step. The vertical step satisfies the just intonation constraint from Section \ref{methodoloy}, whereas the horizontal step satisfies the other three constraints. The vertical step is a relatively standard procedure for just intonation, whereas the horizontal step is a completely new proposal. Figure \ref{fig:algo_outline} shows an outline of the full algorithm.
 
 \begin{figure}
 	\includegraphics[scale=0.35]{Figures/algo_outline.pdf}
-	\caption{A basic view of the algorithm.}
+	\caption{A basic view of the algorithm. tieRadius = 3c, leadRadius = 10c}
 	\label{fig:algo_outline}
 \end{figure}
 
-The algorithm distinguishes between two levels of tuning: \textit{individual bend} and \textit{master bend}. The individual bend describes how much the notes within a chord differ from each other and is determined in the vertical step of the algorithm. A note's individual bend is only relative to the tuning of the other three notes in the chord. On the other hand, the master bend is used to move the entire chord's tuning up or down and is determined in the horizontal step. A note's pitch is ultimately calculated by adding its individual bend to the chord's master bend. Importantly, a note's individual bend never changes after the vertical step of the algorithm is done, making sure the notes of one chord always stay justly tuned with one another.
+The algorithm distinguishes between two levels of tuning: \textit{individual bend} and \textit{master bend}. The individual bend describes how much the notes within a chord differ from each other and is determined in the vertical step of the algorithm. A note's individual bend is only relative to the tuning of the other three notes in the chord, where a chord only spans a period of time where not a single note changes. The master bend, on the other hand, is used to move an entire chord's tuning up or down and is determined in the horizontal step. A note's pitch is ultimately calculated by adding its individual bend to the chord's master bend (\textit{posterior bend}) and using the result as a degree of deviation from just intonation. Importantly, a note's individual bend never changes after the vertical step of the algorithm is done, making sure the notes of one chord always stay justly tuned with one another. Therefore, constraint 1 is always satisfied.
 
-The vertical step determines each note's individual bend using just intonation intervals. The chord root is always set to 0 (again, since these are relative values, that does not actually mean the root will be tuned to the regular ET value). The bend values for the other playing notes are decided using a given set of interval values based on fractions relative to the chord root. These fractions are taken from simple ratios in the harmonic series. To illustrate: the dominant seventh chord is usually described with a $4:5:6:7$ ratio between its chord tones. Therefore, in an A dominant seventh chord (A-C$\sharp$-E-G), the G's frequency will be tuned to be $\frac74$ times the A's frequency. On the other hand, a half-diminished chord is usually described with a $5:6:7:9$ ratio, so in an A half dimished chord (A-C-E$\flat$-G), the G will be equal to $\frac95$ times the A.
+The vertical step (Figure \ref{fig:algo_outline}b) determines each note's individual bend using just intonation intervals. The bend value for the chord root is always set to 0 (again, since these are relative values, that does not actually mean the root will be tuned to the regular 12-tone equal temperament value). The bend values for the other playing notes are decided using a set of interval values based on fractions relative to the chord root. This set of fractions can be given by the user, but a standard set is provided. The fractions are taken from simple ratios in the harmonic series. To illustrate: the dominant seventh chord is usually described with a $4:5:6:7$ ratio between its chord tones. Therefore, in an A dominant seventh chord (A-C$\sharp$-E-G), the G's frequency will be tuned to be $\frac74$ times the A's frequency. On the other hand, a half-diminished chord is usually described with a $5:6:7:9$ ratio, so in an A half-dimished chord (A-C-E$\flat$-G), the G will be equal to $\frac95$ times the A.
 
-The horizontal step moves all chord notes around to satisfy the lead, tie and drift constraints.
+The horizontal step (Figure \ref{fig:algo_outline}c) moves all chord notes around evenly to satisfy constraints 2-4 (lead, tie and drift; see Section \ref{methodoloy}). Specifically, it outputs a master bend value for the current chord by comparing it to the previous chord. For the lead and tie constraints, a collection of lead notes and tied notes from the previous chord is made in order to calculate how much the current master bend can move around while satisfying those constraints. Each of those notes has a desired space that the new note should move into. To illustrate: in the example, $\mathit{tieRadius}$ is set to 3 and the previous G4 is tied over, so the current G4 should be within 3 cents of the old G4. Meanwhile, $\mathit{leadRadius}$ is set to 10 and the previous F4 has a posterior bend of 0 cents, so the current E4 should deviate less than 10 cents from equal temperament. After the collection of lead and tied notes has been completely run through, the algorithm chooses a value for the master bend that is as close to 0 as possible. This last step helps the drift constraint, because a master bend value of 0 means that there is no tonal centre drift.
+
+Ultimately, the algorithm's results depend on a set of parameters given by the user. The first parameter is a set of lists of fractions that should be used for the vertical step. This first parameter is important to note, because opinions vary as to which exact tunings are the best for each interval. The other three parameters are referred to as $\mathit{priority}$, $\mathit{tieRadius}$ and $\mathit{leadRadius}$. $\mathit{priority}$ is either "lead" or "tie" and determines whether the lead or tie constraint should be satisfied first. $\mathit{tieRadius}$, given in a unit similar to cents, determines how much a tied note is allowed to be retuned compared to its predecessor. $\mathit{leadRadius}$ is similar: it determines by how many cents an interval in the lead voice is allowed to deviate from an interval in equal temperament, relatively.
 
 \section{C$\sharp$ Implementation}
 \label{implementation}
+Now that Section \ref{algorithm} has described the just intonation algorithm for barbershop music, we can look at how the algorithm was implemented into the programming language C$\sharp$. This section therefore answers research question B: {\it can we implement the tuning system from question A so that it models the ideal barbershop quartet?}
+
+% Classes: Notes with indivBend, Chords with masterBend, Song and BSTuner to tie it all together
+% Vertical step implementation, \ref{input_fractions}
+% Horizontal step implementation w/ pseudocode
+% MIDI (and analysis) output, with library DryWetMidi: 4 bend messages on each Chord
 
 \begin{figure}
 	\begin{algorithmic}[1]
@@ -153,6 +170,10 @@ The horizontal step moves all chord notes around to satisfy the lead, tie and dr
 
 \section{Results}
 \label{results}
+% algemeen: laat zien hoe het algoritme reageert op een stukje voorbeeldmuziek. Daarbij is dus bladmuziek nodig met annotaties (MScore naar PDF exporteren, dan in Inkscape erbij tekenen). Liefst een stukje waar het dan ook echt bij moet driften voor bepaalde parameters (probeer er een paar uit en laat alles zien).
+
+% examples on github
+% 
 
 \section{Discussion}
 \label{discussion}
@@ -161,5 +182,19 @@ The horizontal step moves all chord notes around to satisfy the lead, tie and dr
 
 
 \bibliography{AdaptiveBarbershop.bib}
+
+\begin{appendices}
+
+\section{Input language}
+\subsection{Songs}
+\label{input_songs}
+% Notes: n, b and #; octaves; tied notes
+% Chords: with 4 notes, sometimes not playing; chord symbols
+% duration in MIDI, timecode at 480 (find unit)
+\subsection{Fractions}
+\label{input_fractions}
+% slashes
+
+\end{appendices}
 
 \end{document}
