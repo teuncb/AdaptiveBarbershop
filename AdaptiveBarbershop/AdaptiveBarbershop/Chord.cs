@@ -16,12 +16,15 @@ namespace AdaptiveBarbershop
         public string fullName;
 
         private static HashSet<char> chordTypes = new HashSet<char>() { 'M', 'm', '7', 'o', '0' };
+        private static char[] delimiters = { '(', ')', ',' };
 
         public Chord(string input, int start)
         {
+            // Comments can be added after a hashtag
+            string noComments = input.Split('#')[0];
+
             // Split the input string into chord name, 4 notes, and duration
-            char[] delimiters = { '(', ')', ',' };
-            string[] portions = input.Split(delimiters);
+            string[] portions = noComments.Split(delimiters);
 
             // Declare the root as a Note based on the string, in lowercase
             try

@@ -13,6 +13,7 @@ namespace AdaptiveBarbershop
         // The 4 voices in order of importance. When optimising tied notes, the lead should be
         // handled first, then the bass, then the tenor and lastly the baritone.
         private static int[] voicesOrder = new int[4] { 2, 0, 3, 1 };
+        private static string[] voices = new string[4] { "bass", "baritone", "lead", "tenor" };
         // Either l for lead or t for tied notes: which one should be optimised first?
         private char priority;
         private static HashSet<char> prioTypes = new HashSet<char> { 'l', 't' };
@@ -54,7 +55,7 @@ namespace AdaptiveBarbershop
             if (analyze)
             {
                 song.drifts = new double[song.chords.Length];
-                song.maxTieDiffs = new (double, int, Note)[song.chords.Length];
+                song.maxTieDiffs = new (double, int, int)[song.chords.Length];
             }
 
             // Carry out the vertical step for each chord
@@ -75,16 +76,19 @@ namespace AdaptiveBarbershop
                     song.drifts[i] = mb - song.chords[i - 1].masterBend;
 
                     // Find the biggest tie difference in this chord
-                    for (int j = 0; j < 4; j++)
+                    for (int v = 0; v < 4; v++)
                     {
-                        Note oldNote = song.chords[i - 1].notes[j];
-                        Note newNote = song.chords[i].notes[j];
-                        double bendDiff = (oldNote.indivBend + song.chords[i - 1].masterBend) - (newNote.indivBend + song.chords[i].masterBend);
-
-                        if (oldNote.tied && 
-                            (Math.Abs(bendDiff) > Math.Abs(song.maxTieDiffs[i].Item1)))
+                        Note oldNote = song.chords[i - 1].notes[v];
+                        Note newNote = song.chords[i].notes[v];
+                        if (oldNote.playing && newNote.playing)
                         {
-                            song.maxTieDiffs[i] = (bendDiff, i, newNote);
+                            double postTieDiff = (oldNote.indivBend + song.chords[i - 1].masterBend) - (newNote.indivBend + song.chords[i].masterBend);
+
+                            if (oldNote.tied &&
+                                (Math.Abs(postTieDiff) > Math.Abs(song.maxTieDiffs[i].Item1)))
+                            {
+                                song.maxTieDiffs[i] = (postTieDiff, i, v);
+                            }
                         }
                     }
                 }
@@ -102,6 +106,7 @@ namespace AdaptiveBarbershop
             Console.WriteLine("The song was successfully tuned. Here are some fun facts:");
             Console.WriteLine("Overall pitch drift: {0}", song.chords[song.chords.Length - 1].masterBend);
 
+            // Find the maximum pitch drift from one chord to the next
             double max = 0;
             int maxIdx = 0;
             for(int i = 0; i < song.drifts.Length; i++)
@@ -112,28 +117,32 @@ namespace AdaptiveBarbershop
                     maxIdx = i;
                 }
             }
-            Console.WriteLine("Most dramatic pitch drift moment: {0:0.0000} when going from chord {1} ({2}) to chord {3} ({4})", 
-                max, maxIdx - 1, song.chords[maxIdx - 1], maxIdx, song.chords[maxIdx]);
+            if (max == 0)
+                Console.WriteLine("There was no pitch drift at all in this song!");
+            else
+                Console.WriteLine("Most dramatic pitch drift moment: {0:0.0000} when going from chord {1} ({2}) to chord {3} ({4})",
+                    max, maxIdx - 1, song.chords[maxIdx - 1], maxIdx, song.chords[maxIdx]);
 
+            // Find the biggest retuning jump in a tied note
             max = 0;
             maxIdx = 0;
-            Note maxNote = null;
-            foreach((double diff, int i, Note n) in song.maxTieDiffs)
+            int maxVoice = -1;
+            foreach((double diff, int c, int v) in song.maxTieDiffs)
             {
                 if (Math.Abs(diff) > Math.Abs(max))
                 {
                     max = diff;
-                    maxIdx = i;
-                    maxNote = n;
+                    maxIdx = c;
+                    maxVoice = v;
                 }
             }
-            if(maxNote is null)
+            if(maxVoice == -1)
             {
                 Console.WriteLine("Not a single tied note had to retune, great!");
             }
             else
-                Console.WriteLine("Most dramatic tie change: {0:0.0000} in the note {1} from chord {2} ({3}) to chord {4} ({5})",
-                max, maxNote.noteNum, maxIdx - 1, song.chords[maxIdx - 1], maxIdx, song.chords[maxIdx]);
+                Console.WriteLine("Most dramatic tie change: {0:0.0000} in the {1} from chord {2} ({3}) to chord {4} ({5})",
+                max, voices[maxVoice], maxIdx - 1, song.chords[maxIdx - 1], maxIdx, song.chords[maxIdx]);
         }
 
         // Given a bend range as a fraction of a half step, randomly assign individual bends to each note in a chord

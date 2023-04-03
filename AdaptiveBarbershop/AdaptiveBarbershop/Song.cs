@@ -11,7 +11,8 @@ namespace AdaptiveBarbershop
     {
         public Chord[] chords;
         public double[] drifts; // For analysis; constains the tonal centre drift for each chord change
-        public (double,int,Note)[] maxTieDiffs; // For analysis; contains the biggest tied note retuning for each chord change
+        // For analysis, maxTieDiffs contains the biggest tied note retuning for each chord change
+        public (double,int,int)[] maxTieDiffs; // retuning value, chord index, voice index
 
         public Song(string path)
             /// Initialises a Song from a path in the described song language

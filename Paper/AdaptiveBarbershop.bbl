@@ -41,4 +41,47 @@ L.~Garnett, ``Ethics and aesthetics: the social theory of barbershop harmony,''
 {MIDI Manufacturers Association}, ``The {Complete} {MIDI} 1.0 {Detailed}
   {Specification},'' 2014.
 
+\bibitem{van_maanen_interpretation_2021}
+L.~van Maanen and S.~Miletić, ``The interpretation of behavior-model
+  correlations in unidentified cognitive models,'' {\em Psychon Bull Rev},
+  vol.~28, pp.~374--383, Apr. 2021.
+
+\bibitem{hagerman_fundamental_1980}
+B.~Hagerman and J.~Sundberg, {\em Fundamental frequency adjustment in
+  barbershop singing}.
+\newblock Citeseer, 1980.
+
+\bibitem{devaney_study_2012}
+J.~Devaney, M.~Mandel, and I.~Fujinaga, ``A study of intonation in three-part
+  singing using the {Automatic} {Music} {Performance} {Analysis} and
+  {Comparison} {Toolkit} ({AMPACT}),'' {\em Proceedings of the 13th
+  International Society for Music Information Retrieval Conference, ISMIR
+  2012}, pp.~511--516, Jan. 2012.
+
+\bibitem{mauch_intonation_2014}
+M.~Mauch, K.~Frieler, and S.~Dixon, ``Intonation in unaccompanied singing:
+  {Accuracy}, drift, and a model of reference pitch memory,'' {\em The Journal
+  of the Acoustical Society of America}, vol.~136, p.~401, July 2014.
+
+\bibitem{dai_intonation_2019}
+J.~Dai and S.~Dixon, ``Intonation trajectories within tones in unaccompanied
+  soprano, alto, tenor, bass quartet singing,'' {\em The Journal of the
+  Acoustical Society of America}, vol.~146, pp.~1005--1014, Aug. 2019.
+
+\bibitem{parncutt_psychocultural_2018}
+R.~Parncutt and G.~Hair, ``A {Psychocultural} {Theory} of {Musical} {Interval}:
+  {Bye} {Bye} {Pythagoras},'' {\em Music Perception}, vol.~35, pp.~475--501,
+  Apr. 2018.
+
+\bibitem{walshaw_abc2mtex_1997}
+C.~Walshaw, ``{ABC2MTEX}: {An} easy way of transcribing folk and traditional
+  music, {Version} 1.0,'' 1997.
+
+\bibitem{burgoyne_cross-validated_2007}
+J.~Burgoyne, L.~Pugin, C.~Kereliuk, and I.~Fujinaga, {\em A {Cross}-{Validated}
+  {Study} of {Modelling} {Strategies} for {Automatic} {Chord} {Recognition} in
+  {Audio}.}
+\newblock Jan. 2007.
+\newblock Pages: 254.
+
 \end{thebibliography}

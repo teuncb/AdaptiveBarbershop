@@ -8,9 +8,9 @@ namespace AdaptiveBarbershop
         static void Main(string[] args)
         {
             // FULL ALGORITHM TESTING CODE
-            string songName = "benedetti_pump";
+            string songName = "ding_goes_my_heart";
             Song song = new Song("../../../../../Songs/" + songName + ".txt");
-            BSTuner tuner = new BSTuner(tieRadius: 0);
+            BSTuner tuner = new BSTuner(tieRadius: 0, prio: 't');
 
             song.WriteMidiFile(songName + "_untuned");
             tuner.TuneSong(song);

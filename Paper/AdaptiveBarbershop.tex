@@ -43,10 +43,6 @@ When talking about the difference between just intonation and 12-tone equal temp
 
 \subsection{Adaptive Just Intonation Systems}
 \label{intro_adaptive_ji}
-
-% iets over violen, trombones en zang
-% iets over hermode, pivotuner en sethares
-% problemen met bv. zakken
 Although just intonation is impossible to achieve when all twelve tones have a fixed tuning, such as on an acoustic piano, it can be achieved when using instruments that can \textit{adaptively} tune specific notes. In other words, if a note can be tuned differently based on which other notes are playing, the strict mathematical ratios of just intonation can be followed. This idea is, for example, applied to ensembles with human voices, trombones or string instruments such as the violin, since all of those instruments can continuously change their pitch by ear.\cite{van_de_craats_fis_1989}
 
 Modern computational techniques also allow digital instruments to be tuned adaptively. Much research has been done into automatic \textit{adaptive tuning systems}: programs that take sets of musical notes as input, and return their respective tunings according to just intonation as output. Sethares (1994) approached the problem very generally by minimising a loss function based on a sound's dissonance curve.\cite{sethares_adaptive_1994} Løberg (2002) implemented a dynamic tuning system by the Norwegian composer Eivind Groven that dynamically chooses between 36 available tones to get just intervals.\cite{code_grovenmax_2002} Commercial software such as Hermode Tuning\cite{mohrlok_hermode_2003} and Pivotuner\cite{noauthor_pivotuner_nodate} can be integrated into music software to retune all played notes based on the sounding chord.
@@ -103,7 +99,7 @@ This paper will propose an algorithm that adaptively tunes barbershop scores to 
 	\item minimise (but not necessarily eliminate) tonal centre drift [\textit{drift constraint}]
 \end{enumerate}
 
-The input of the algorithm consists of \verb+.txt+ files that describe a barbershop score. The \verb+.txt+ files should be written using a specific, newly-defined language that contains information about note pitches, harmonies, tied notes and durations. This language is described in Appendix \ref{input_language}. Importantly, the input should have already split the score into \textit{Chords}, which in this case are periods of time where none of the notes changes. A new Chord begins any time one of the four voices stops singing, starts singing or moves to a different pitch. Figure \ref{fig:chords} visualises such a split score.
+The input of the algorithm consists of \verb+.txt+ files that describe a barbershop score. The \verb+.txt+ files should be written using a newly-defined language specific to this project that contains information about note pitches, harmonies, tied notes and durations. This language is described in Appendix \ref{input_language}. Importantly, the input splits the score into \textit{Chords}, which in this case are periods of time where none of the notes changes. A new Chord begins any time one of the four voices stops singing, starts singing or moves to a different pitch. Figure \ref{fig:chords} visualises such a split score.
 
 Because of this newly-defined language, a parser must be programmed to convert the input \verb+.txt+ files into the program's internal data structure. Conversion from original sheet music to the input language is, for now, a human job.
 
@@ -177,15 +173,32 @@ Now that Section \ref{algorithm} has described the just intonation algorithm for
 
 \section{Discussion}
 \label{discussion}
+\subsection{Results evaluation}
+% Was het goed?
 
+\subsection{In musical contexts}
+% Is zo'n algoritme wel realistisch? Iets met een cognitief model
+% Hagerman citaties; Bye Bye Pythagoras: is JI wel beter?
+% 12-toonsstemming is niet overal het best; andere approach is Sethares
+The use of a model such as the one proposed is debatable. For human performers, this algorithm would be impossible to realise; the exact calculations required would be too complicated to carry out while singing and the tiniest intonation changes cannot be replicated using the human voice. Also, the algorithm's goal is not to "capture theories of cognitive functioning in mathematical or computational form", which means it is not exactly a cognitive model.\cite{van_maanen_interpretation_2021} However, the algorithm's results could serve as a reference for real singers to hear what a potentially ideal method of tuning could be. Additionally, high-level findings from the algorithm such as described in section \ref{results} could give singers a frame of reference as to how they should generally tune their notes in a barbershop context.
 
+Even the concept of just intonation itself is a subject of debate: are the intervals from the harmonic series really the best way to tune? Hagerman \& Sundberg analysed recordings of barbershop quartets and found that the tenor, baritone and bass use the lead as a reference to adjust their pitches, but their intervals often deviate from just intonation.\cite{hagerman_fundamental_1980} Thanks to new technologies in music information retrieval, intonation and drift in choirs have been analysed in recent years.\cite{devaney_study_2012, mauch_intonation_2014, dai_intonation_2019} Results from these analyses have even led some researchers to conclude that just intonation as a whole is not the ideal tuning method.\cite{parncutt_psychocultural_2018} However, not enough research has been done to completely isolate these findings from twelve-tone bias.
 
+At the same time, it is important to note that twelve-tone bias does play a role in this article's proposed tuning system. Barbershop music is composed with the standard twelve-tone tuning system in mind and this algorithm does tend to return to them as a result of the lead and drift constraints. A tuning method that does not adhere to the twelve-tone system and is therefore more culturally independent, was proposed by Sethares. Instead of using fractions from the harmonic series, he proposes to analyse a note's timbre using its \textit{dissonance curve}.\cite{sethares_adaptive_1994} However, since this article focuses specifically on barbershop, dissonance curves will always adhere to the natural harmonic series and using the twelve-tone system is commonplace. For these reasons, it was decided not to use Sethares' proposal in the current research.
+
+\subsection{Future Work}
+% MIDI Input of op z'n minst abc-notatie
+% Analyse van echte barbershopintonatie (AMPACT, devaney)
+The input for this algorithm was a newly-defined language, described in Appendix \ref{input}. Translating a score into this language has turned out to be a painstaking process and could be optimised better. One more commom way to describe music in plain text is abc notation, which also allows chord annotation.\cite{walshaw_abc2mtex_1997} However, since automatic chord recognition has improved in the past couple of decades\cite{burgoyne_cross-validated_2007}, an implementation of this algorithm could easily be built that simply takes MIDI as input. Essentially, the only thing that the tuning system has to add is pitch bend messages.
+
+The scope of this paper did not allow for a comparison to real-world barbershop quartets. In recent years, systems such as AMPACT can be used to evaluate the tuning tendencies of real choirs.\cite{devaney_study_2012} Analysing the difference between mathematically ideal algorithms such as the one proposed and the tendencies of professional barbershop quartets could lead to an even better tuning system. Eventually, a tuning system might be developed that all barbershop musicians can refer to when singing their genre.
 
 \bibliography{AdaptiveBarbershop.bib}
 
 \begin{appendices}
 
 \section{Input language}
+\label{input}
 \subsection{Songs}
 \label{input_songs}
 % Notes: n, b and #; octaves; tied notes
