@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.IO;
 
 namespace AdaptiveBarbershop
 {
@@ -7,14 +8,48 @@ namespace AdaptiveBarbershop
     {
         static void Main(string[] args)
         {
-            // FULL ALGORITHM TESTING CODE
-            string songName = "ding_alternate";
-            Song song = new Song("../../../../../Songs/" + songName + ".txt");
-            BSTuner tuner = new BSTuner(tieRadius: 0, prio: 't');
+            // FULL ALGORITHM RESULTS CODE
+            string songTitle = "ding_alternate";
+            Song song = new Song(songTitle, print:false);
+            song.WriteMidiFile(songTitle + "_untuned");
 
-            song.WriteMidiFile(songName + "_untuned");
-            tuner.TuneSong(song);
-            song.WriteMidiFile(songName + "_tuned");
+            double[] tieRadii = new double[] { 0, 0.03, 0.10, 0.5, 2.0 };
+            double[] leadRadii = new double[] { 0, 0.10, 0.20, 0.5, 2.0 };
+            char[] prios = new char[] { 't', 'l' };
+            BSTuner[,,] tuners = new BSTuner[tieRadii.Length, leadRadii.Length, prios.Length];
+
+            StreamWriter sw = new StreamWriter("../../../../../OutputMidi/params_results.csv");
+
+            for (int t = 0; t < tuners.GetLength(0); t++)
+            {
+                for(int l = 0; l < tuners.GetLength(1); l++)
+                {
+                    for(int p = 0; p < tuners.GetLength(2); p++)
+                    {
+                        tuners[t, l, p] = new BSTuner(
+                            tieRadius: tieRadii[t],
+                            leadRadius: leadRadii[l],
+                            prio: prios[p]);
+
+                        Console.WriteLine("Now tuning with {0}; {1}; {2}", t, l, p);
+
+                        song = new Song(songTitle, print: false);
+                        string parameters = string.Format("{0};{1};{2};", tieRadii[t], leadRadii[l], prios[p]);
+                        string analysis = tuners[t, l, p].TuneSong(song, print:false);
+                        sw.WriteLine(parameters + analysis);
+                        //song.WriteMidiFile(string.Format(
+                        //    "{0}_tuned_{1:0.00}_{2:0.00}_{3}",
+                        //    songTitle,
+                        //    tieRadii[t],
+                        //    leadRadii[l],
+                        //    prios[p])
+                        //    );
+                    }
+                }
+            }
+
+            sw.Close();
+
             Console.WriteLine("Success!");
             Console.ReadLine();
 

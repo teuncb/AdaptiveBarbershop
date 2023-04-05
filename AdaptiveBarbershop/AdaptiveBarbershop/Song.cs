@@ -10,13 +10,17 @@ namespace AdaptiveBarbershop
     class Song
     {
         public Chord[] chords;
+        public string songTitle;
         public double[] drifts; // For analysis; constains the tonal centre drift for each chord change
-        // For analysis, maxTieDiffs contains the biggest tied note retuning for each chord change
-        public (double,int,int)[] maxTieDiffs; // retuning value, chord index, voice index
+        // For analysis, these two arrays contain the biggest tied resp. lead note retuning for each chord change
+        public (double,int)[] maxTieDiffs; // retuning value, voice index
+        public double[] leadDevs; // deviation from ET
 
-        public Song(string path)
+        public Song(string title, bool print = false)
             /// Initialises a Song from a path in the described song language
         {
+            songTitle = title;
+            string path = "../../../../../Songs/" + songTitle + ".txt";
             string[] lines = File.ReadAllLines(path);
             chords = new Chord[lines.Length];
 
@@ -42,7 +46,7 @@ namespace AdaptiveBarbershop
                             // ...throw an exception
                             throw new FormatException(string.Format(
                                 "The chords on lines {0} and {1} contain conflicting tie/pitch information in {2}",
-                                i - 1, i, path));
+                                i - 1, i, songTitle));
                         }
                     }
                 }

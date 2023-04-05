@@ -18,7 +18,7 @@ namespace AdaptiveBarbershop
         private static HashSet<char> chordTypes = new HashSet<char>() { 'M', 'm', '7', 'o', '0' };
         private static char[] delimiters = { '(', ')', ',' };
 
-        public Chord(string input, int start)
+        public Chord(string input, int start, bool print = false)
         {
             // Comments can be added after a percent sign
             string noComments = input.Split('%')[0];
@@ -48,7 +48,7 @@ namespace AdaptiveBarbershop
             notes = new Note[4];
             for (int i = 0; i < notes.Length; i++)
             {
-                notes[i] = new Note(portions[i + 1]);
+                notes[i] = new Note(portions[i + 1], print);
             }
 
             startTime = start;
@@ -68,8 +68,11 @@ namespace AdaptiveBarbershop
             events.Add(new PitchBendEvent(BSTuner.MIDIBend(masterBend, notes[0]))
             { Channel = (FourBitNumber)0, DeltaTime = firstDeltaTime });
             for (int i = 1; i < notes.Length; i++)
-                events.Add(new PitchBendEvent(BSTuner.MIDIBend(masterBend, notes[i])) 
+            {
+                ushort midiBend = BSTuner.MIDIBend(masterBend, notes[i]);
+                events.Add(new PitchBendEvent(midiBend)
                 { Channel = (FourBitNumber)i });
+            }
 
             // Add note-on for new notes that aren't silent in this chord and aren't already playing
             for (int i = 0; i < notes.Length; i++)

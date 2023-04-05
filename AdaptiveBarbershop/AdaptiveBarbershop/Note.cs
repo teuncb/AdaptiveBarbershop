@@ -25,7 +25,7 @@ namespace AdaptiveBarbershop
             { "bb", 10}, { "bn", 11}, { "b#", 12}
         };
 
-        public Note(string input)
+        public Note(string input, bool print = false)
         {
             if(input == "    ")
             {
@@ -37,13 +37,15 @@ namespace AdaptiveBarbershop
             playing = true;
             midiNoteID = 88;
 
-            Console.WriteLine("Building note from input string " + input);
+            if(print)
+                Console.WriteLine("Building note from input string " + input);
             noteName = input.Substring(0, 2);
             noteNum = noteNames[noteName];
             octave = int.Parse(input.Substring(2, 1));
             // Lowest MIDI key on a piano is A0, which has noteNum 9. In MIDI, A0 has noteID 21.
             midiNoteID = (octave + 1) * 12 + noteNum;
-            Console.WriteLine(string.Format("note ID turned out to be {0}", midiNoteID));
+            if(print)
+                Console.WriteLine(string.Format("note ID turned out to be {0}", midiNoteID));
 
             if(midiNoteID < 21 || midiNoteID > 108)
             {

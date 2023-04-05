@@ -25,7 +25,7 @@ namespace AdaptiveBarbershop
         private Dictionary<char, Fraction[]> tuningTables;
 
         // Initialise the tuner type, setting the global parameters
-        public BSTuner(double stepSize = 1, double tieRadius = 0.03, double leadRadius = 0.15, char prio = 't',
+        public BSTuner(double stepSize = 1, double tieRadius = 0.03, double leadRadius = 0.20, char prio = 't',
             string pathMaj     = "../../../../../TuningTables/maj_lim17.txt",
             string pathMin     = "../../../../../TuningTables/min_lim7.txt",
             string pathDom     = "../../../../../TuningTables/maj_lim17.txt",
@@ -50,18 +50,21 @@ namespace AdaptiveBarbershop
         }
 
         // Master method for the tuning algorithm: tunes an entire song
-        public void TuneSong(Song song, bool analyze = true)
+        public string TuneSong(Song song, bool analyze = true, bool print = false)
         {
+            string analysis = "";
+
             if (analyze)
             {
                 song.drifts = new double[song.chords.Length];
-                song.maxTieDiffs = new (double, int, int)[song.chords.Length];
+                song.maxTieDiffs = new (double, int)[song.chords.Length];
+                song.leadDevs = new double[song.chords.Length];
             }
 
             // Carry out the vertical step for each chord
             for (int i = 0; i < song.chords.Length; i++)
             {
-                SetIndivBends(song.chords[i]);
+                SetIndivBends(song.chords[i], print);
             }
 
             // Set the lead to equal temperament in the first chord
@@ -87,24 +90,35 @@ namespace AdaptiveBarbershop
                             if (oldNote.tied &&
                                 (Math.Abs(postTieDiff) > Math.Abs(song.maxTieDiffs[i].Item1)))
                             {
-                                song.maxTieDiffs[i] = (postTieDiff, i, v);
+                                song.maxTieDiffs[i] = (postTieDiff, v);
                             }
                         }
                     }
+
+                    // Find how much the lead deviates from equal temperament
+                    Note oldLead = song.chords[i - 1].notes[2];
+                    Note newLead = song.chords[i].notes[2];
+                    double postLeadDev = (oldLead.indivBend + song.chords[i - 1].masterBend) - (newLead.indivBend + song.chords[i].masterBend);
+                    song.leadDevs[i] = postLeadDev;
                 }
-                Console.WriteLine("Set master bend for chord {0} to {1:0.0000}", i, mb);
+                if(print)
+                    Console.WriteLine("Set master bend for chord {0} to {1:0.0000}", i, mb);
             }
 
             if (analyze)
             {
-                AnalyzeTuning(song);
-                song.WriteResults("analysis");
+                analysis = AnalyzeTuning(song);
+                song.WriteResults(song.songTitle + "_analysis");
             }
+
+            return analysis;
         }
 
-        public void AnalyzeTuning(Song song)
+        public string AnalyzeTuning(Song song)
             /// Gives some overall statistics on how tuning this song went.
         {
+            string analysis = "";
+
             Console.WriteLine("--------------------------------");
             Console.WriteLine("The song was successfully tuned. Here are some fun facts:");
             Console.WriteLine("Overall pitch drift: {0}", song.chords[song.chords.Length - 1].masterBend);
@@ -126,12 +140,15 @@ namespace AdaptiveBarbershop
                 Console.WriteLine("Most dramatic pitch drift moment: {0:0.0000} when going from chord {1} ({2}) to chord {3} ({4})",
                     max, maxIdx - 1, song.chords[maxIdx - 1], maxIdx, song.chords[maxIdx]);
 
+            analysis += string.Format("{0:0.0000};", max);
+
             // Find the biggest retuning jump in a tied note
             max = 0;
-            maxIdx = 0;
+            maxIdx = -1;
             int maxVoice = -1;
-            foreach((double diff, int c, int v) in song.maxTieDiffs)
+            for(int c = 0; c < song.maxTieDiffs.Length; c++)
             {
+                (double diff, int v) = song.maxTieDiffs[c];
                 if (Math.Abs(diff) > Math.Abs(max))
                 {
                     max = diff;
@@ -139,30 +156,44 @@ namespace AdaptiveBarbershop
                     maxVoice = v;
                 }
             }
-            if(maxVoice == -1)
+            if(maxIdx == -1)
             {
                 Console.WriteLine("Not a single tied note had to retune, great!");
             }
             else
                 Console.WriteLine("Most dramatic tie change: {0:0.0000} in the {1} from chord {2} ({3}) to chord {4} ({5})",
                 max, voices[maxVoice], maxIdx - 1, song.chords[maxIdx - 1], maxIdx, song.chords[maxIdx]);
-        }
 
-        // Given a bend range as a fraction of a half step, randomly assign individual bends to each note in a chord
-        // This function was mostly useful for debugging
-        public void RandomlyAssignIndivBends(Chord chord, double bendRange = 0.3)
-        {
-            Random random = new Random();
+            analysis += string.Format("{0:0.0000};", max);
 
-            foreach(Note n in chord.notes)
+            // Find the biggest deviation from equal temperament in the lead voice
+            max = 0;
+            maxIdx = -1;
+            for(int c = 0; c < song.leadDevs.Length; c++)
             {
-                n.indivBend = 0.8 + (random.NextDouble() * (bendRange * 2)) - bendRange;
+                if(Math.Abs(song.leadDevs[c]) > Math.Abs(max))
+                {
+                    max = song.leadDevs[c];
+                    maxIdx = c;
+                }
             }
+            if(maxIdx == -1)
+            {
+                Console.WriteLine("Every lead interval was exactly like equal temperament, great!");
+            }
+            else
+                Console.WriteLine("Most dramatic ET deviation in the lead: {0:0.0000} from chord {1} ({2}) to chord {3} ({4})",
+                max, maxIdx - 1, song.chords[maxIdx - 1], maxIdx, song.chords[maxIdx]);
+
+            analysis += string.Format("{0:0.0000}", max);
+
+            Console.WriteLine("--------------------------------");
+            return analysis;
         }
 
-        // Initialise a table of interval fractions from a file
-        // These are the fractions that will be used for just intonation intervals in the vertical step
         public Fraction[] TuningTable(string tablePath)
+            /// Initialise a table of interval fractions from a file
+            /// These are the fractions that will be used for just intonation intervals in the vertical step
         {
             // Require exactly 12 fractions
             string[] lines = File.ReadAllLines(tablePath);
@@ -183,18 +214,18 @@ namespace AdaptiveBarbershop
         }
 
         // Vertically tunes the notes inside a chord to just intonation relative to the root
-        public void SetIndivBends(Chord chord)
+        public void SetIndivBends(Chord chord, bool print = false)
         {
             foreach (Note note in chord.notes)
             {
                 if (note.playing)
-                    note.indivBend = GetIndivBend(note.noteNum, chord.root, tuningTables[chord.chordType]);
+                    note.indivBend = GetIndivBend(note.noteNum, chord.root, tuningTables[chord.chordType], print);
                 else
                     note.indivBend = 0;
             }
         }
 
-        public double GetIndivBend(int note, int root, Fraction[] tuningTable)
+        public double GetIndivBend(int note, int root, Fraction[] tuningTable, bool print = false)
         {
             // The number of half steps until note is reached, counting upwards from root
             int distInHalfSteps = note - root;
@@ -209,7 +240,8 @@ namespace AdaptiveBarbershop
 
             // Return how much note should deviate from equal temperament
             double indivBend = fullDist - distInHalfSteps * halfStepSize;
-            Console.WriteLine("Tuning note {0} with root {1} to value {2:0.0000} using fraction {3}", note, root, indivBend, interval);
+            if(print)
+                Console.WriteLine("Tuning note {0} with root {1} to value {2:0.0000} using fraction {3}", note, root, indivBend, interval);
             return indivBend;
         }
 
@@ -222,7 +254,7 @@ namespace AdaptiveBarbershop
 
         // TODO this currently prioritises ties over lead, make that a parameter option by changing the order of ranges
         // TODO optionally, add the lead functionality to the bass as well
-        public double SetMasterBend(Chord prevChord, Chord currChord)
+        public double SetMasterBend(Chord prevChord, Chord currChord, bool print = false)
         {
             // Make a list of note indices that have a tie property, ordered like voicesOrder
             List<int> ties = new List<int>();
@@ -303,7 +335,8 @@ namespace AdaptiveBarbershop
                     // Ignore pitch drift and subsequent notes, compromise with the next note
                     else if (overlapResult > 0)
                     {
-                        Console.WriteLine("Range with index {0} cannot be satisfied, choosing the highest possible masterBend.", i);
+                        if(print)
+                            Console.WriteLine("Range with index {0} cannot be satisfied, choosing the highest possible masterBend.", i);
                         currChord.masterBend = masterBendRange.upper;
                         return masterBendRange.upper;
                     }
@@ -311,7 +344,8 @@ namespace AdaptiveBarbershop
                     // Ignore pitch drift and subsequent notes, compromise with the next note
                     else
                     {
-                        Console.WriteLine("Range with index {0} cannot be satisfied, choosing the lowest possible masterBend.", i);
+                        if(print)
+                            Console.WriteLine("Range with index {0} cannot be satisfied, choosing the lowest possible masterBend.", i);
                         currChord.masterBend = masterBendRange.lower;
                         return masterBendRange.lower;
                     }
@@ -320,20 +354,23 @@ namespace AdaptiveBarbershop
                 // Return the possible value that is closest to 0
                 if (masterBendRange.lower > 0)
                 {
-                    Console.WriteLine("All ranges satisfied, choosing lowest possible masterBend.");
+                    if(print)
+                        Console.WriteLine("All ranges satisfied, choosing lowest possible masterBend.");
                     currChord.masterBend = masterBendRange.lower;
                     return masterBendRange.lower;
                 }
                 else if (masterBendRange.upper < 0)
                 {
-                    Console.WriteLine("All ranges satisfied, choosing highest possible masterBend.");
+                    if(print)
+                        Console.WriteLine("All ranges satisfied, choosing highest possible masterBend.");
                     currChord.masterBend = masterBendRange.upper;
                     return masterBendRange.upper;
                 }
                 else
                 {
                     // This should be unreachable code, since we covered this in option 1
-                    Console.WriteLine("Warning: reached code that should be unreachable in getMasterBend()");
+                    if(print)
+                        Console.WriteLine("Warning: reached code that should be unreachable in getMasterBend()");
                     currChord.masterBend = 0;
                     return 0;
                 }
@@ -351,11 +388,11 @@ namespace AdaptiveBarbershop
 
             // MIDI maximum bend range is 2 half steps. If the bend exceeds that, just send a different MIDI noteID
             // TODO this doesn't quite work yet
-            if (midiNoteBend >= 16383 || midiNoteBend <= -16383)
+            if (midiNoteBend >= 16383 || midiNoteBend < 0)
             {
-                int distInHalfSteps = midiNoteBend / 8192;
-                note.midiNoteID += distInHalfSteps;
-                midiNoteBend -= (distInHalfSteps - 1) * 8192;
+                int distInHalfSteps = (midiNoteBend - 8192) / 4086; // 4086 = 1 semitone
+                note.midiNoteID += distInHalfSteps; // choose a new MIDI noteID
+                midiNoteBend -= (distInHalfSteps) * 4086; // subtract the necessary semitones
             }
 
             // If midiNoteBend is outside this range AGAIN, then the algorithm wants to tune
@@ -366,116 +403,128 @@ namespace AdaptiveBarbershop
             return (ushort)midiNoteBend;
         }
 
-        struct Range
+        public void RandomlyAssignIndivBends(Chord chord, double bendRange = 0.3)
+        /// Given a bend range as a fraction of a half step, randomly assign individual bends to each note in a chord
+        /// This function was mostly useful for debugging
         {
-            public double lower;
-            public double upper;
-            public Range (double l, double u)
-            {
-                lower = l;
-                upper = u;
-            }
+            Random random = new Random();
 
-            public bool Contains(double x)
+            foreach (Note n in chord.notes)
             {
-                return (x >= lower && x <= upper);
+                n.indivBend = 0.8 + (random.NextDouble() * (bendRange * 2)) - bendRange;
             }
+        }
+    }
 
-            // Returns 'o' if r1 and r2 overlap; 'h' if r2 is completely above r1; 'l' if r2 is completely below r1.
-            public static double Distance(Range r1, Range r2)
+    struct Range
+    {
+        public double lower;
+        public double upper;
+        public Range(double l, double u)
+        {
+            lower = l;
+            upper = u;
+        }
+
+        public bool Contains(double x)
+        {
+            return (x >= lower && x <= upper);
+        }
+
+        // Returns 'o' if r1 and r2 overlap; 'h' if r2 is completely above r1; 'l' if r2 is completely below r1.
+        public static double Distance(Range r1, Range r2)
+        {
+            if (r2.lower <= r1.upper && r2.upper >= r1.lower)
             {
-                if (r2.lower <= r1.upper && r2.upper >= r1.lower)
-                {
-                    return 0;
-                }
-                // Positive result if r2 is higher than r1
-                else if (r2.lower > r1.upper)
-                {
-                    return r2.lower - r1.upper;
-                }
-                // Negative result if r2 is lower than r1
-                else
-                {
-                    return r2.upper - r1.lower;
-                }
+                return 0;
             }
-
-            // Check whether two ranges overlap and return the overlapping part
-            public static Range GetOverlap(Range r1, Range r2)
+            // Positive result if r2 is higher than r1
+            else if (r2.lower > r1.upper)
             {
-                if (r1.lower > r1.upper || r2.lower > r2.upper)
-                    throw new ArgumentException("Invalid range in overlap method");
-
-                Range ol = r1;
-
-                if(Distance(r1, r2) == 0)
-                {
-                    if (r2.lower > ol.lower)
-                        ol.lower = r2.lower;
-                    if (r2.upper < ol.upper)
-                        ol.upper = r2.upper;
-                    return ol;
-                }
-                else
-                {
-                    // There is no overlap
-                    throw new ArgumentException("These two ranges do not overlap.");
-                }
+                return r2.lower - r1.upper;
             }
-            // Move both bounds of a Range up by a given distance
-            public Range MoveBy(double distance)
+            // Negative result if r2 is lower than r1
+            else
             {
-                Range res = this;
-                res.lower += distance;
-                res.upper += distance;
-                return res;
-            }
-
-            // Define equality operators for the Range struct
-            public static bool operator ==(Range r1, Range r2)
-            {
-                return r1.upper == r2.upper && r1.lower == r2.lower;
-            }
-            public static bool operator !=(Range r1, Range r2)
-            {
-                return r1.upper != r2.upper || r1.lower != r2.lower;
+                return r2.upper - r1.lower;
             }
         }
 
-        public struct Fraction
+        // Check whether two ranges overlap and return the overlapping part
+        public static Range GetOverlap(Range r1, Range r2)
         {
-            public int numerator;
-            public int denominator;
+            if (r1.lower > r1.upper || r2.lower > r2.upper)
+                throw new ArgumentException("Invalid range in overlap method");
 
-            public Fraction(int num, int denom)
+            Range ol = r1;
+
+            if (Distance(r1, r2) == 0)
             {
-                numerator = num;
-                denominator = denom;
+                if (r2.lower > ol.lower)
+                    ol.lower = r2.lower;
+                if (r2.upper < ol.upper)
+                    ol.upper = r2.upper;
+                return ol;
             }
-            public Fraction(string input)
+            else
             {
-                // Comments can be added after a hashtag
-                string noComments = input.Split('#')[0];
-
-                string[] portions = noComments.Split('/');
-
-                if (!input.Contains('/') || portions.Length != 2)
-                    throw new FormatException(string.Format("The fraction {0} can't be parsed", input));
-
-                numerator = int.Parse(portions[0]);
-                denominator = int.Parse(portions[1]);
-
-                if(denominator == 0)
-                    throw new DivideByZeroException(string.Format("The fraction {0} has 0 as its denominator, which is impossible", input));
+                // There is no overlap
+                throw new ArgumentException("These two ranges do not overlap.");
             }
-            public double ToFactor()
-            {
-                return ((double)numerator / (double)denominator);
-            }
-            public override string ToString()
-            {
-                return numerator.ToString() + "/" + denominator.ToString();
-            }
+        }
+        // Move both bounds of a Range up by a given distance
+        public Range MoveBy(double distance)
+        {
+            Range res = this;
+            res.lower += distance;
+            res.upper += distance;
+            return res;
+        }
+
+        // Define equality operators for the Range struct
+        public static bool operator ==(Range r1, Range r2)
+        {
+            return r1.upper == r2.upper && r1.lower == r2.lower;
+        }
+        public static bool operator !=(Range r1, Range r2)
+        {
+            return r1.upper != r2.upper || r1.lower != r2.lower;
+        }
+    }
+
+    public struct Fraction
+    {
+        public int numerator;
+        public int denominator;
+
+        public Fraction(int num, int denom)
+        {
+            numerator = num;
+            denominator = denom;
+        }
+        public Fraction(string input)
+        {
+            // Comments can be added after a hashtag
+            string noComments = input.Split('#')[0];
+
+            string[] portions = noComments.Split('/');
+
+            if (!input.Contains('/') || portions.Length != 2)
+                throw new FormatException(string.Format("The fraction {0} can't be parsed", input));
+
+            numerator = int.Parse(portions[0]);
+            denominator = int.Parse(portions[1]);
+
+            if (denominator == 0)
+                throw new DivideByZeroException(string.Format("The fraction {0} has 0 as its denominator, which is impossible", input));
+        }
+        public double ToFactor()
+        {
+            return ((double)numerator / (double)denominator);
+        }
+        public override string ToString()
+        {
+            return numerator.ToString() + "/" + denominator.ToString();
         }
     }
 }
