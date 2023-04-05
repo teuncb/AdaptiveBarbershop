@@ -7,6 +7,7 @@ namespace AdaptiveBarbershop
     {
         public bool playing;
         public int noteNum;
+        public string noteName;
         public int octave;
         public bool tied;
         public double indivBend;
@@ -29,6 +30,7 @@ namespace AdaptiveBarbershop
             if(input == "    ")
             {
                 playing = false;
+                noteName = "  ";
                 return;
             }
 
@@ -36,10 +38,11 @@ namespace AdaptiveBarbershop
             midiNoteID = 88;
 
             Console.WriteLine("Building note from input string " + input);
-            noteNum = noteNames[input.Substring(0, 2)];
+            noteName = input.Substring(0, 2);
+            noteNum = noteNames[noteName];
             octave = int.Parse(input.Substring(2, 1));
             // Lowest MIDI key on a piano is A0, which has noteNum 9. In MIDI, A0 has noteID 21.
-            midiNoteID = (octave + 2) * 12 + noteNum - 9;
+            midiNoteID = (octave + 1) * 12 + noteNum;
             Console.WriteLine(string.Format("note ID turned out to be {0}", midiNoteID));
 
             if(midiNoteID < 21 || midiNoteID > 108)

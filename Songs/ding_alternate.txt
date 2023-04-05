@@ -14,13 +14,13 @@ Eb7(bb3t,    ,gn4t,db5t)320 % (1)
 Eb7(bb3t,eb4 ,gn4t,db5t)160 % a'
 Eb7(bb3t,eb4 ,gn4t,db5t)480 % right
 Eb7(bb3t,fn4 ,gn4t,db5t)320 % from
-Eb7(bb3 ,eb4 ,gn4 ,db5t)480 % the
-Gb7(fb4t,gb4t,bb4t,db5t)160 % start
-Gb7(fb4 ,gb4 ,bb4t,db5t)1440% (1)
-Gb7(    ,    ,bb4t,db5t)480 
-Eb7(eb4t,    ,bb4t,db5t)960 % my (bass)
-Eb7(eb4 ,gn4t,bb4t,db5t)960 % my (bari)
-Eb7(eb4 ,gn4 ,bb4t,db5t)480 % all
-Gb7(ab3 ,gb4 ,bb4t,db5 )1440% my
+Eb7(bb3t,eb4 ,gn4 ,db5t)480 % the
+Gb7(bb3t,fb4t,gb4t,db5t)160 % start
+Gb7(bb3t,fb4 ,gb4t,db5t)1440% (1)
+Gb7(bb3t,    ,gb4 ,db5t)480 
+Eb7(bb3t,eb4t,    ,db5t)960 % my (bari)
+Eb7(bb3t,eb4 ,gb4t,db5t)960 % my (ten)
+Eb7(bb3t,eb4 ,gb4 ,db5t)480 % all
+Gb7(bb3t,gb4 ,ab4 ,db5 )1440% my
 BbM(bb3t,fn4t,bb4t,dn5t)1920% heart
 BbM(bb3 ,fn4 ,bb4 ,dn5 )1920% (last measure)

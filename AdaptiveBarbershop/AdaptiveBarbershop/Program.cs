@@ -8,14 +8,14 @@ namespace AdaptiveBarbershop
         static void Main(string[] args)
         {
             // FULL ALGORITHM TESTING CODE
-            string songName = "ding_goes_my_heart";
+            string songName = "ding_alternate";
             Song song = new Song("../../../../../Songs/" + songName + ".txt");
             BSTuner tuner = new BSTuner(tieRadius: 0, prio: 't');
 
             song.WriteMidiFile(songName + "_untuned");
             tuner.TuneSong(song);
             song.WriteMidiFile(songName + "_tuned");
-            Console.WriteLine("Success!?");
+            Console.WriteLine("Success!");
             Console.ReadLine();
 
             // VERTICAL STEP TESTING CODE

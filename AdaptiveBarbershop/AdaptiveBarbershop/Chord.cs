@@ -20,8 +20,8 @@ namespace AdaptiveBarbershop
 
         public Chord(string input, int start)
         {
-            // Comments can be added after a hashtag
-            string noComments = input.Split('#')[0];
+            // Comments can be added after a percent sign
+            string noComments = input.Split('%')[0];
 
             // Split the input string into chord name, 4 notes, and duration
             string[] portions = noComments.Split(delimiters);
@@ -102,6 +102,17 @@ namespace AdaptiveBarbershop
         public override string ToString()
         {
             return fullName;
+        }
+        public string PrintChord()
+            /// A formatted string with bend values for each note
+        {
+            string result = string.Format("{0} - MB:{1:+0.0000;-0.0000;=0.0000}. Post bends:", fullName, masterBend);
+            for(int i = 0; i < notes.Length; i++)
+            {
+                double posteriorBend = masterBend + notes[i].indivBend;
+                result += string.Format(" {0}: {1:+0.0000;-0.0000;=0.0000};",notes[i].noteName,posteriorBend);
+            }
+            return result;
         }
     }
 }

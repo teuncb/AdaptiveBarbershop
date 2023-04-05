@@ -62,6 +62,20 @@ namespace AdaptiveBarbershop
             MIDISong().Write(path, overwriteFile);
             Console.WriteLine("Successfully wrote a MIDI file to " + folder + fileName + ".mid");
         }
+        public void WriteResults(string fileName)
+            /// Writes an analysis file for the user to examine the posterior bends for each note in the song
+        {
+            string folder = "OutputMidi/";
+            string path = "../../../../../" + folder + fileName + ".txt";
+            StreamWriter sw = new StreamWriter(path);
+
+            for(int i = 0; i < chords.Length; i++)
+            {
+                sw.WriteLine(chords[i].PrintChord());
+            }
+            sw.Close();
+            Console.WriteLine("Successfully wrote a txt file to " + folder + fileName + ".txt");
+        }
 
         public MidiFile MIDISong(int tempo = 150000, int instrument = 72)
         {

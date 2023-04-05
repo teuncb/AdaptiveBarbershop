@@ -96,7 +96,10 @@ namespace AdaptiveBarbershop
             }
 
             if (analyze)
+            {
                 AnalyzeTuning(song);
+                song.WriteResults("analysis");
+            }
         }
 
         public void AnalyzeTuning(Song song)
@@ -186,6 +189,8 @@ namespace AdaptiveBarbershop
             {
                 if (note.playing)
                     note.indivBend = GetIndivBend(note.noteNum, chord.root, tuningTables[chord.chordType]);
+                else
+                    note.indivBend = 0;
             }
         }
 
