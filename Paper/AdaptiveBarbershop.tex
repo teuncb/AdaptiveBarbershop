@@ -8,6 +8,9 @@
 \usepackage{caption}
 \usepackage[toc,page]{appendix}
 
+% Times font
+\usepackage{mathptmx}
+
 \bibliographystyle{ieeetr}
 
 \title{An Adaptive Just Intonation Algorithm for Barbershop Quartets}
@@ -16,8 +19,18 @@
 \begin{document}
 \maketitle
 
+% Thanks:
+% Jeroen en Peter
+% Jos en Tijs
+% Marc en Than
+% Jasper en Jay
+
+% TODO: Abstract
+\begin{abstract}
+	\textit{\color{red}Hier komt dus waarschijnlijk nog een abstract. Of is dat niet nodig volgens jullie?}
+\end{abstract}
+
 \section{Introduction}
-% TODO put a very short intro here. Start with "The piano is out of tune", make sure the first paragraph of 1.1 is a bit clearer (maybe completely move it here)
 The piano is out of tune; every \textit{musical interval} (i.e. distance between two tones) is slightly too small or too big in the standard tuning of the piano.\cite{van_de_craats_fis_1989} Music groups that have the possibility to, often attempt to tune their chords according to "just intonation" instead, adaptively retuning every note such that it works well in context. Barbershop quartets, for instance, explicitly try to achieve just intonation on every chord. However, when performers want to keep notes at the same pitch over different chords while tuning in just intonation, there is no unbiased answer to the question how exactly each note should be tuned.
 
 The current study tries to answer that specific question for barbershop quartets: {\it what adaptive tuning algorithm would a mathematically ideal barbershop quartet follow, given a score?} (research question A). Afterwards, this study will implement this algorithm in order to answer research question B: {\it can we implement the tuning system from question A so that it models the ideal barbershop quartet?} In order to provide the necessary context for this question, the following paragraphs will expand upon the subjects of just intonation, adaptive just intonation algorithms and barbershop music.
@@ -31,15 +44,21 @@ Sadly, it is mathematically impossible to devise a fixed tuning for a set of twe
 
 \begin{figure}
 	\centering
-	\includegraphics[scale=0.5]{Figures/ThirdsProof.pdf}
+	\includegraphics[width=0.6\linewidth]{Figures/ThirdsProof.pdf}
 	\caption{12 fixed tones are not compatible with just intonation. For each coloured tone, its frequency ratio with the low C is written. The difference with equal temperament in cents is also written. The bottom path shows that a high C should be tuned at exactly twice the frequency of the low C, when tuning the octave justly. The top path instead uses justly tuned major thirds with the standard $5:4$ ratio. The two paths come out at a different tuning for the high C, proving that major thirds and octaves are incompatible.}
 	\label{fig:thirdsproof}
 \end{figure}
 
-% TODO: cents calculation
-Most modern music accepts the fact that just intonation cannot be achieved, using the tuning system of \textit{equal temperament} as a substitute. In twelve-tone equal temperament, the octave is divided into twelve equal divisions. Since the octave is defined by the frequency ratio $2:1$, this custom puts the smallest interval (the semitone) at exactly $\sqrt[12]{2}:1$. For example, if an A is tuned at $220$ Hz, then the lowest tone above this A, a B$\flat$, will be tuned at $220\cdot \frac{\sqrt[12]{2}}{1} \approx 233.08$ Hz.\cite{van_de_craats_fis_1989} Twelve-tone equal temperament works relatively well for some intervals, such as the fifth, which is only slightly too small compared to just intonation. On the contrary, intervals like the major third and the minor seventh are significantly smaller in just intonation than in equal temperament. Figure \ref{fig:121TET} shows the standard tuning in equal temperament for a part of the piano keyboard. 
+Most modern music accepts the fact that just intonation cannot be achieved, using the tuning system of \textit{equal temperament} as a substitute. In twelve-tone equal temperament, the octave is divided into twelve equal divisions. Since the octave is defined by the frequency ratio $2:1$, this custom puts the smallest interval (the semitone) at exactly $\sqrt[12]{2}:1$. For example, if an A is tuned at $220$ Hz, then the lowest tone above this A, a B$\flat$, will be tuned at $220\cdot \frac{\sqrt[12]{2}}{1} \approx 233.08$ Hz.\cite{van_de_craats_fis_1989} Twelve-tone equal temperament works relatively well for some intervals, such as the fifth, which is only slightly too small compared to just intonation. On the contrary, intervals like the major third and the minor seventh are significantly smaller in just intonation than in equal temperament. Figure \ref{fig:12TET} shows the standard tuning in equal temperament for a part of the piano keyboard.
 
-When talking about the difference between just intonation and 12-tone equal temperament, the \textit{cent} interval is often used as a unit. 1 cent is defined as $\frac{1}{100}$ of a semitone in equal temperament, meaning it has a frequency ratio of $\sqrt[1200]{2}:1$. A justly tuned major third, for example, is 14 cents lower than a major third in equal temperament (Figure \ref{fig:thirdsproof}).
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\linewidth]{Figures/12TET.pdf}
+	\caption{A selection of standard frequency values for piano in equal temperament, shown in Hertz. Equal temperament is the most common tuning method and ensures that each semitone is always the same relative size, namely $\sqrt[12]{2}:1$. However, just intonation is not compatible with equal temperament; for example, this A3 and E4 have a frequency ratio that is slightly smaller than that of a just fifth, which would be $3:2$.}
+	\label{fig:12TET}
+\end{figure}
+
+When talking about the difference between just intonation and 12-tone equal temperament, the \textit{cent} interval is often used as a unit. 1 cent is defined as $\frac{1}{100}$ of a semitone in equal temperament, meaning it has a frequency ratio of $\sqrt[1200]{2}:1$. A justly tuned major third, for example, is 14 cents lower than a major third in equal temperament (Figure \ref{fig:thirdsproof}).\footnote{The addition of the cent interval leaves us with three different ways to describe a tone's exact tuning: in Hertz, with a fraction or in cents. Hertz makes the most sense in phyics: an A3 can be tuned at 220 Hz, whereas an E4 would be tuned at 329.63 Hz on a piano. In just intonation, we often use fractions: when tuning an E4 to be a perfect fifth above this A3, the E4's tuning would need to be $\frac32$ times the frequency of the A3 (equivalently, 330.00 Hz). The cent interval puts this abstract difference in perspective: 330.00 Hz is 2 cents higher than 329.63 Hz, meaning $\frac{2}{100}$ of a semitone.}
 
 \subsection{Adaptive Just Intonation Systems}
 \label{intro_adaptive_ji}
@@ -99,7 +118,15 @@ This paper will propose an algorithm that adaptively tunes barbershop scores to 
 	\item minimise (but not necessarily eliminate) tonal centre drift [\textit{drift constraint}]
 \end{enumerate}
 
-The input of the algorithm consists of \verb+.txt+ files that describe a barbershop score. The \verb+.txt+ files should be written using a newly-defined language specific to this project that contains information about note pitches, harmonies, tied notes and durations. This language is described in Appendix \ref{input_language}. Importantly, the input splits the score into \textit{Chords}, which in this case are periods of time where none of the notes changes. A new Chord begins any time one of the four voices stops singing, starts singing or moves to a different pitch. Figure \ref{fig:chords} visualises such a split score.
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\linewidth]{Figures/pipeline.pdf}
+	\caption{Pipeline for an adaptive just intonation algorithm for barbershop music. The program works on any four-part score, but requires a human tagger to translate it to a language that is specific to this algorithm. A parser can then interpret this language and build the internal data structure that the main algorithm uses to determine how each note should be tuned. At last, the library DryWetMidi is used to convert the tuned internal data structure to a MIDI file with pitch bend messages.}
+	\label{fig:pipeline}
+\end{figure}
+
+The input of the algorithm consists of \verb+.txt+ files that describe a barbershop score. The \verb+.txt+ files should be written using a newly-defined language specific to this project that contains information about note pitches, harmonies, tied notes and durations. This language is described in Appendix \ref{input}. Importantly, the input splits the score into \textit{Chords}, which in this case are periods of time where none of the notes change. A new Chord begins any time one of the four voices stops singing, starts singing or moves to a different pitch. Figure \ref{fig:algo_outline} visualises such a split score.
+% TODO betere figuur hier
 
 Because of this newly-defined language, a parser must be programmed to convert the input \verb+.txt+ files into the program's internal data structure. Conversion from original sheet music to the input language is, for now, a human job.
 
@@ -112,10 +139,10 @@ The output of the algorithm consists of a MIDI file\cite{midi_manufacturers_asso
 % describe vertical step
 % describe horizontal step
 % parameters
-This section will describe the tuning algorithm proposed by this paper, thereby answering research question A: {\it what adaptive tuning algorithm would a mathematically ideal barbershop quartet follow, given a score?}. The algorithm returns a set of bend values that prescribe how much each note in the song should deviate from 12-tone equal temperament. The algorithm consists of a vertical step and a horizontal step. The vertical step satisfies the just intonation constraint from Section \ref{methodoloy}, whereas the horizontal step satisfies the other three constraints. The vertical step is a relatively standard procedure for just intonation, whereas the horizontal step is a completely new proposal. Figure \ref{fig:algo_outline} shows an outline of the full algorithm.
+This section will describe the tuning algorithm proposed by this paper, thereby answering research question A: {\it what adaptive tuning algorithm would a mathematically ideal barbershop quartet follow, given a score?} The algorithm returns a set of bend values that prescribe how much each note in the song should deviate from 12-tone equal temperament. The algorithm consists of a vertical step and a horizontal step. The vertical step satisfies the just intonation constraint from Section \ref{methodoloy}, whereas the horizontal step satisfies the other three constraints. The vertical step is a relatively standard procedure for just intonation, whereas the horizontal step is a completely new proposal. Figure \ref{fig:algo_outline} shows an outline of the full algorithm.
 
 \begin{figure}
-	\includegraphics[scale=0.35]{Figures/algo_outline.pdf}
+	\includegraphics[width=\linewidth]{Figures/algo_outline.pdf}
 	\caption{A basic view of the algorithm. tieRadius = 3c, leadRadius = 10c}
 	\label{fig:algo_outline}
 \end{figure}
@@ -131,6 +158,8 @@ Ultimately, the algorithm's results depend on a set of parameters given by the u
 \section{C$\sharp$ Implementation}
 \label{implementation}
 Now that Section \ref{algorithm} has described the just intonation algorithm for barbershop music, we can look at how the algorithm was implemented into the programming language C$\sharp$. This section therefore answers research question B: {\it can we implement the tuning system from question A so that it models the ideal barbershop quartet?}
+
+\textit{\color{red}Dit ga ik nog schrijven, maar is niet het interessantste deel om te lezen}
 
 % Classes: Notes with indivBend, Chords with masterBend, Song and BSTuner to tie it all together
 % Vertical step implementation, \ref{input_fractions}
@@ -160,7 +189,7 @@ Now that Section \ref{algorithm} has described the just intonation algorithm for
 		\EndIf
 		\EndProcedure
 	\end{algorithmic}
-	\caption{Pseudocode for the horizontal step.}
+	\caption{Pseudocode for the horizontal step. \textit{\color{red}Hier komt nog meer uitleg, hoort bij het implementatie-hoofdstuk}}
 	\label{fig:pseudocodeH}
 \end{figure}
 
@@ -172,11 +201,29 @@ Now that Section \ref{algorithm} has described the just intonation algorithm for
 
 % Om te zien hoe dit algoritme het doet: stukje voorbeeldmuziek met verschillende parameters
 % We gebruiken dit nummer, is interessant voor deze redenen (bv. 2 lange tied noten, zoals vaak in tags)
+This section will show the proposed algorithm's effect on an example score, namely the tag of \textit{Ring-a-Ding-Ding}, arranged by Anthony Bartholomew. Several good recordings of this song can be found on \href{https://www.youtube.com/watch?v=G40I5JDtfjI&t=147s}{YouTube}. Figure \ref{fig:ding_sheets} shows the sheet music for this tag. Since both the bass and tenor voice hold notes for a long time while the lead and baritone sing phrases inbetween, \textit{Ring-a-Ding-Ding} is a good example to show how the proposed algorithm makes choices in ambiguous scenarios.
+
+Figure \ref{fig:results} shows the effects that the three parameters (tieRadius, leadRadius and priority, see )
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\linewidth]{Figures/Ding_MuseScore.pdf}
+	\caption{Sheet music for the tag of Ring-a-Ding-Ding, a barbershop arrangement by Anthony Bartholomew.}
+	\label{fig:ding_sheets}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\linewidth]{Results/effects_ring.pdf}
+	\caption{Results from the proposed algorithm on the tag of Ring-a-Ding-Ding (sheet music in Figure \ref{fig:ding_sheets}). The graphs show the effects of parameter changes on three measures: overall tonal centre drift in cents (red), number of tied note retunings over 3 cents (blue) and number of deviations from equal temperament in the lead voice larger than 10 cents (green). The tieRadius and leadRadius parameters determine how loosely the algorithm allows the most important held notes to retune (tie constraint) and how loosely it allows the lead voice's intervals to deviate from equal temperament. The left two graphs have the \textit{priority} set to "tie", whereas the right two graphs have it set to "lead". Both parameters appear to have a similar effect on how many notes need to retune, how many lead intervals are outside equal temperament and how much the song drifts overall. \textit{\color{red}Tjaaaa, dit kan mooier en beschrijvender. Ik wil in ieder geval nog iets doen met het feit dat blauw en groen bij elkaar horen, suggesties zijn zeer welkom}}
+	\label{fig:results}
+\end{figure}
 
 \section{Discussion}
 \label{discussion}
 \subsection{Results evaluation}
 % Was het goed?
+\textit{\color{red}Iets met dat dit best oké is, logisch dat er zo'n sprong in de blauwe lijnen zit want dat is waar het algoritme het oké gaat vinden dat tied notes volledig herstemmen. Iets van discussie over dat drift steeds lager wordt als je minder streng bent, maar dat betekent dus wel dat alle noten een beetje meh herstemd moeten worden. Oeps, dat laatste kun je eigenlijk nog niet zo goed zien in het grafiekje}
 
 \subsection{In musical contexts}
 % Is zo'n algoritme wel realistisch? Iets met een cognitief model
@@ -188,6 +235,9 @@ Even the concept of just intonation itself is a subject of debate: are the inter
 
 At the same time, it is important to note that twelve-tone bias does play a role in this article's proposed tuning system. Barbershop music is composed with the standard twelve-tone tuning system in mind and this algorithm does tend to return to them as a result of the lead and drift constraints. A tuning method that does not adhere to the twelve-tone system and is therefore more culturally independent, was proposed by Sethares. Instead of using fractions from the harmonic series, he proposes to analyse a note's timbre using its \textit{dissonance curve}.\cite{sethares_adaptive_1994} However, since this article focuses specifically on barbershop, dissonance curves will always adhere to the natural harmonic series and using the twelve-tone system is commonplace. For these reasons, it was decided not to use Sethares' proposal in the current research.
 
+\subsection{Philosophical Framework}
+\textit{\color{red}Hier kan ik schrijven over ethische consequenties en het verschil tussen strong en weak AI. Dat ga ik alleen nog doen als ik tijd over heb, waarschijnlijk niet dus.}
+
 \subsection{Future Work}
 % MIDI Input of op z'n minst abc-notatie
 % Analyse van echte barbershopintonatie (AMPACT, devaney)
@@ -195,12 +245,17 @@ The input for this algorithm was a newly-defined language, described in Appendix
 
 The scope of this paper did not allow for a comparison to real-world barbershop quartets. In recent years, systems such as AMPACT can be used to evaluate the tuning tendencies of real choirs.\cite{devaney_study_2012} Analysing the difference between mathematically ideal algorithms such as the one proposed and the tendencies of professional barbershop quartets could lead to an even better tuning system. Eventually, a tuning system might be developed that all barbershop musicians can refer to when singing their genre.
 
+
+
+\paragraph{\textit{\color{red}Nog niet alle referenties werken goed, vooral die van webpagina's, Jos help!!}}
 \bibliography{AdaptiveBarbershop.bib}
 
 \begin{appendices}
 
 \section{Input language}
 \label{input}
+
+\textit{\color{red}Ook dit ga ik nog schrijven en ook dit is niet zo interessant}
 \subsection{Songs}
 \label{input_songs}
 % Notes: n, b and #; octaves; tied notes

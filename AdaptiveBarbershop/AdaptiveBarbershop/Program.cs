@@ -14,9 +14,9 @@ namespace AdaptiveBarbershop
             song.WriteMidiFile(songTitle + "_untuned");
 
             //double[] tieRadii = new double[] { 0, 0.03, 0.10, 0.5, 2.0 };
-            var tieRadii = Enumerable.Range(0, 15).Select(i => i / 50.0);
+            var tieRadii = Enumerable.Range(0, 15).Select(i => i / 80.0);
             //double[] leadRadii = new double[] { 0, 0.10, 0.20, 0.5, 2.0 };
-            var leadRadii = Enumerable.Range(0, 15).Select(i => i / 50.0);
+            var leadRadii = Enumerable.Range(0, 15).Select(i => i / 80.0);
             char[] prios = new char[] { 't', 'l' };
             BSTuner[,] tunersTies = new BSTuner[tieRadii.Count(), prios.Length];
             BSTuner[,] tunersLead = new BSTuner[leadRadii.Count(), prios.Length];
