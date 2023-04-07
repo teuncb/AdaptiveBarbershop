@@ -14,6 +14,7 @@ namespace AdaptiveBarbershop
         public double[] drifts; // For analysis; constains the tonal centre drift for each chord change
         // For analysis, these two arrays contain the biggest tied resp. lead note retuning for each chord change
         public (double,int)[] maxTieDiffs; // retuning value, voice index
+        public double[][] tieDiffs; // retuning values for each voice
         public double[] leadDevs; // deviation from ET
 
         public Song(string title, bool print = false)

@@ -58,6 +58,7 @@ namespace AdaptiveBarbershop
             {
                 song.drifts = new double[song.chords.Length];
                 song.maxTieDiffs = new (double, int)[song.chords.Length];
+                song.tieDiffs = new double[song.chords.Length][];
                 song.leadDevs = new double[song.chords.Length];
             }
 
@@ -69,15 +70,31 @@ namespace AdaptiveBarbershop
 
             // Set the lead to equal temperament in the first chord
             InitialMasterBend(song.chords[0]);
+            if (analyze)
+                song.tieDiffs[0] = new double[4] { 0, 0, 0, 0 };
 
             // Carry out the horizontal step for each subsequent chord
             for (int i = 1; i < song.chords.Length; i++)
             {
                 double mb = SetMasterBend(song.chords[i - 1], song.chords[i]);
+
                 if (analyze)
                 {
                     song.drifts[i] = mb - song.chords[i - 1].masterBend;
 
+                    // Record all tie differences in this chord
+                    song.tieDiffs[i] = new double[4];
+                    for (int v = 0; v < 4; v++)
+                    {
+                        if (song.chords[i - 1].notes[v].tied)
+                        {
+                            Note oldNote = song.chords[i - 1].notes[v];
+                            Note newNote = song.chords[i].notes[v];
+                            double postTieDiff = (oldNote.indivBend + song.chords[i - 1].masterBend) - (newNote.indivBend + song.chords[i].masterBend);
+                            song.tieDiffs[i][v] = postTieDiff;
+                        }
+                    }
+                        
                     // Find the biggest tie difference in this chord
                     for (int v = 0; v < 4; v++)
                     {
@@ -101,6 +118,7 @@ namespace AdaptiveBarbershop
                     double postLeadDev = (oldLead.indivBend + song.chords[i - 1].masterBend) - (newLead.indivBend + song.chords[i].masterBend);
                     song.leadDevs[i] = postLeadDev;
                 }
+
                 if(print)
                     Console.WriteLine("Set master bend for chord {0} to {1:0.0000}", i, mb);
             }
@@ -142,6 +160,14 @@ namespace AdaptiveBarbershop
 
             analysis += string.Format("{0:0.0000};", max);
 
+            // Find the number of retuning jumps in tied notes over 3 cents
+            int retunings = 0;
+            for (int c = 0; c < song.tieDiffs.Length; c++)
+                for(int v = 0; v < 4; v++)
+                    if (song.tieDiffs[c][v] > 0.03)
+                        retunings++;
+            Console.WriteLine("Tied notes had to be retuned audibly {0} times", retunings);
+
             // Find the biggest retuning jump in a tied note
             max = 0;
             maxIdx = -1;
@@ -166,6 +192,13 @@ namespace AdaptiveBarbershop
 
             analysis += string.Format("{0:0.0000};", max);
 
+            // Find the number of retuning jumps in tied notes over 10 cents
+            int deviations = 0;
+            for (int c = 0; c < song.leadDevs.Length; c++)
+                if (song.leadDevs[c] > 0.10)
+                    deviations++;
+            Console.WriteLine("Lead intervals had to deviate audibly from ET {0} times", deviations);
+
             // Find the biggest deviation from equal temperament in the lead voice
             max = 0;
             maxIdx = -1;
@@ -185,7 +218,8 @@ namespace AdaptiveBarbershop
                 Console.WriteLine("Most dramatic ET deviation in the lead: {0:0.0000} from chord {1} ({2}) to chord {3} ({4})",
                 max, maxIdx - 1, song.chords[maxIdx - 1], maxIdx, song.chords[maxIdx]);
 
-            analysis += string.Format("{0:0.0000}", max);
+            analysis += string.Format("{0:0.0000};", max);
+            analysis += string.Format("{0};{1}", retunings, deviations);
 
             Console.WriteLine("--------------------------------");
             return analysis;
