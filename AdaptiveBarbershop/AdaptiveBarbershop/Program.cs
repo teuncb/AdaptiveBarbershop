@@ -8,12 +8,6 @@ namespace AdaptiveBarbershop
     {
         static void Main(string[] args)
         {
-            //BSTuner tuner = new BSTuner(tieRadius: 0.03, leadRadius: 0.10, prio: 'l');
-            //tuner.SetMasterBend(
-            //    new Chord("BbM(bb3t,dn4 ,fn4 ,bb4 )480 % my ", 0, print: true),
-            //    new Chord("Bbm(bb3t,fn4t,ab4t,db5t)160 % heart", 480, print: true),
-            //    print: true);
-
             // FULL ALGORITHM RESULTS CODE
             string songTitle = "ding_alternate";
             Song song = new Song(songTitle, print: false);

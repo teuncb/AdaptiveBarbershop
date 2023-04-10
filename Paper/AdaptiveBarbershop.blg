@@ -7,45 +7,45 @@ Reallocating 'name_of_file' (item size: 1) to 23 items.
 Database file #1: AdaptiveBarbershop.bib
 Warning--empty journal in barbershop_harmony_society_contest_2022
 Warning--empty publisher in burgoyne_cross-validated_2007
-You've used 18 entries,
+You've used 22 entries,
             1876 wiz_defined-function locations,
-            573 strings with 6258 characters,
-and the built_in function-call counts, 3690 in all, are:
-= -- 378
-> -- 106
+            602 strings with 7048 characters,
+and the built_in function-call counts, 4818 in all, are:
+= -- 511
+> -- 128
 < -- 0
-+ -- 45
-- -- 27
-* -- 223
-:= -- 509
-add.period$ -- 24
-call.type$ -- 18
-change.case$ -- 15
++ -- 55
+- -- 33
+* -- 294
+:= -- 671
+add.period$ -- 33
+call.type$ -- 22
+change.case$ -- 19
 chr.to.int$ -- 0
-cite$ -- 20
-duplicate$ -- 181
-empty$ -- 389
-format.name$ -- 27
-if$ -- 919
+cite$ -- 24
+duplicate$ -- 238
+empty$ -- 494
+format.name$ -- 33
+if$ -- 1197
 int.to.chr$ -- 0
-int.to.str$ -- 18
-missing$ -- 15
-newline$ -- 64
-num.names$ -- 16
-pop$ -- 74
+int.to.str$ -- 22
+missing$ -- 20
+newline$ -- 80
+num.names$ -- 22
+pop$ -- 79
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 140
+skip$ -- 177
 stack$ -- 0
-substring$ -- 194
-swap$ -- 67
+substring$ -- 282
+swap$ -- 93
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
 warning$ -- 2
-while$ -- 36
-width$ -- 20
-write$ -- 162
+while$ -- 51
+width$ -- 24
+write$ -- 213
 (There were 2 warnings)

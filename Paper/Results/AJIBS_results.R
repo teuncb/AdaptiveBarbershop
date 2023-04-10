@@ -49,6 +49,7 @@ plot(datTiesT$tieRadius, datTiesT$posterior_drift, pch = pch_drift, col = col_dr
      xlab="", ylab="")
 axis(side=2, col=col_drift, col.axis=col_drift)
 lines(datTiesT$tieRadius, datTiesT$posterior_drift, col=col_drift)
+abline(h=0, col=col_drift, lty="dashed")
 
 par(new = TRUE)
 
@@ -77,6 +78,7 @@ plot(datTiesL$tieRadius, datTiesL$posterior_drift, pch = pch_drift, col = col_dr
      xlab="", ylab="")
 axis(side=2, col=col_drift, col.axis=col_drift)
 lines(datTiesL$tieRadius, datTiesL$posterior_drift, col=col_drift)
+abline(h=0, col=col_drift, lty="dashed")
 
 par(new = TRUE)
 
@@ -106,6 +108,7 @@ plot(datLeadT$leadRadius, datLeadT$posterior_drift, pch = pch_drift, col = col_d
      xlab="", ylab="")
 axis(side=2, col=col_drift, col.axis=col_drift)
 lines(datLeadT$leadRadius, datLeadT$posterior_drift, col=col_drift)
+abline(h=0, col=col_drift, lty="dashed")
 
 par(new = TRUE)
 
@@ -131,6 +134,7 @@ plot(datLeadL$leadRadius, datLeadL$posterior_drift, pch = pch_drift, col = col_d
      xlab="", ylab="")
 axis(side=2, col=col_drift, col.axis=col_drift)
 lines(datLeadL$leadRadius, datLeadL$posterior_drift, col=col_drift)
+abline(h=0, col=col_drift, lty="dashed")
 
 par(new = TRUE)
 
@@ -152,7 +156,7 @@ mtext("leadRange (c)", side = 1, line = 3)
 ### LEGEND ###
 plot(1, type = "n", axes=FALSE, xlab="", ylab="")
 
-legend("bottom",legend = c("posterior drift (c)", "n of tied note retunings", "n of deviations from ET in lead"), 
+legend("bottom",legend = c("posterior drift (c)", "n of tied note retunings", "n of deviations from ET in lead intervals"), 
        col = cols, pch = pchs, horiz = TRUE, lwd=1, bty='n')
 
 par(ps = title_size + 5)
