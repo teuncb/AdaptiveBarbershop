@@ -59,6 +59,52 @@ namespace AdaptiveBarbershop
                     throw new FormatException(string.Format("Last chord cannot have tied notes"));
             }
         }
+        public void AnalyzeMasterBend(int i)
+        {
+            drifts[i] = chords[i].masterBend - chords[i - 1].masterBend;
+
+            // Record all tie differences in this chord
+            tieDiffs[i] = new double[4];
+            for (int v = 0; v < 4; v++)
+            {
+                if (chords[i - 1].notes[v].tied)
+                {
+                    Note oldNote = chords[i - 1].notes[v];
+                    Note newNote = chords[i].notes[v];
+                    double postTieDiff = 
+                        (oldNote.indivBend + chords[i - 1].masterBend) - 
+                        (newNote.indivBend + chords[i].masterBend);
+                    tieDiffs[i][v] = postTieDiff;
+                }
+            }
+
+            // Find the biggest tie difference in this chord
+            for (int v = 0; v < 4; v++)
+            {
+                Note oldNote = chords[i - 1].notes[v];
+                Note newNote = chords[i].notes[v];
+                if (oldNote.playing && newNote.playing)
+                {
+                    double postTieDiff = 
+                        (oldNote.indivBend + chords[i - 1].masterBend) - 
+                        (newNote.indivBend + chords[i].masterBend);
+
+                    if (oldNote.tied &&
+                        (Math.Abs(postTieDiff) > Math.Abs(maxTieDiffs[i].Item1)))
+                    {
+                        maxTieDiffs[i] = (postTieDiff, v);
+                    }
+                }
+            }
+
+            // Find how much the lead deviates from equal temperament
+            Note oldLead = chords[i - 1].notes[2];
+            Note newLead = chords[i].notes[2];
+            double postLeadDev = 
+                (oldLead.indivBend + chords[i - 1].masterBend) - 
+                (newLead.indivBend + chords[i].masterBend);
+            leadDevs[i] = postLeadDev;
+        }
         public void WriteMidiFile(string fileName, bool overwriteFile = true)
             /// Writes this entire song to a new MIDI file
         {

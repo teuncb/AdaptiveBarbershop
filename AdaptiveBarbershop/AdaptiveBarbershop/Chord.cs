@@ -7,18 +7,20 @@ namespace AdaptiveBarbershop
 {
     class Chord
     {
-        public Note[] notes;
-        public double masterBend;
-        public int startTime;
-        public int duration;
-        public int root;
-        public char chordType; // TODO meer commentaar
-        public string fullName;
+        public Note[] notes;        // An array of the 4 notes in this chord
+        public double masterBend;   // How much the entire chord should be bent up or down, in semitones
+        public int duration;        // Length of the chord, by default in 480 MIDI ticks per quarter note
+        public int root;            // noteNum (0-11) of the note used as a reference for the vertical tuning step
+        public char chordType;      // Major, minor, dominant, diminished or half diminished, see chordTypes
+        public string fullName;     // The three characters that describe the chord itself, used for printing
 
         private static HashSet<char> chordTypes = new HashSet<char>() { 'M', 'm', '7', 'o', '0' };
         private static char[] delimiters = { '(', ')', ',' };
 
         public Chord(string input, int start, bool print = false)
+        /// Initializes a Chord from an input string as described in Appendix A of the paper.
+        /// <param name="input">sets the absolute startTime.</param>
+        /// <param name="print">whether to print update messages inbetween.</param>
         {
             // Comments can be added after a percent sign
             string noComments = input.Split('%')[0];
@@ -51,12 +53,10 @@ namespace AdaptiveBarbershop
                 notes[i] = new Note(portions[i + 1], print);
             }
 
-            startTime = start;
             duration = int.Parse(portions[5]);
             masterBend = 0;
         }
 
-        // TODO handling of DeltaTime for completely silent and completely tied chords
         public (List<ChannelEvent>, int) MidiEvents(bool[] previousTies, int firstDeltaTime = 0)
         {
             if (previousTies.Length != 4)
@@ -80,7 +80,7 @@ namespace AdaptiveBarbershop
                     events.Add(new NoteOnEvent((SevenBitNumber)notes[i].midiNoteID, (SevenBitNumber)100) 
                     { Channel = (FourBitNumber)i });
 
-            // Add note-off for non-tied notes that aren't silent in this chord
+            // Add note-off for aren't silent or tied in this chord
             bool addedDeltaTime = false;
             for (int i = 0; i < notes.Length; i++)
                 if (notes[i].playing && !notes[i].tied)

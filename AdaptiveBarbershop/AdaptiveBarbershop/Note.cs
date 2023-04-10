@@ -5,15 +5,15 @@ namespace AdaptiveBarbershop
 {
     class Note
     {
-        public bool playing;
-        public int noteNum;
-        public string noteName;
-        public int octave;
-        public bool tied;
-        public double indivBend;
-        public int midiNoteID; // TODO This isn't necessarily right after bending, when I'm implementing MIDI I should change this
+        public bool playing;    // Is any note playing in thie chord?
+        public int noteNum;     // Usually between 0 and 11: 0 = c, 1 = c#, etc.
+        public string noteName; // The actual note name
+        public int octave;      // This note's octave as in scientific pitch notation (where middle C is C4)
+        public bool tied;       // Whether this note is held into the next chord
+        public double indivBend;// Deviation from temperament in semitones
+        public int midiNoteID;  // Number of this note as it would be in a MIDI file
 
-        // Translates note names within the octave
+        // Translates note names within the octave to their noteNums
         public static Dictionary<string, int> noteNames = new Dictionary<string, int>
         {
             { "cb",-1 }, { "cn", 0 }, { "c#", 1 },
@@ -26,6 +26,8 @@ namespace AdaptiveBarbershop
         };
 
         public Note(string input, bool print = false)
+            /// Initializes a Note from an input string as described in Appendix A of the paper.
+            /// <param name="print">whether to print update messages inbetween.</param>
         {
             if(input == "    ")
             {

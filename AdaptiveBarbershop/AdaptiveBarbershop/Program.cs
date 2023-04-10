@@ -8,33 +8,39 @@ namespace AdaptiveBarbershop
     {
         static void Main(string[] args)
         {
+            //BSTuner tuner = new BSTuner(tieRadius: 0.03, leadRadius: 0.10, prio: 'l');
+            //tuner.SetMasterBend(
+            //    new Chord("BbM(bb3t,dn4 ,fn4 ,bb4 )480 % my ", 0, print: true),
+            //    new Chord("Bbm(bb3t,fn4t,ab4t,db5t)160 % heart", 480, print: true),
+            //    print: true);
+
             // FULL ALGORITHM RESULTS CODE
             string songTitle = "ding_alternate";
-            Song song = new Song(songTitle, print:false);
+            Song song = new Song(songTitle, print: false);
             song.WriteMidiFile(songTitle + "_untuned");
 
             //double[] tieRadii = new double[] { 0, 0.03, 0.10, 0.5, 2.0 };
-            var tieRadii = Enumerable.Range(0, 15).Select(i => i / 80.0);
+            var tieRadii = Enumerable.Range(0, 30).Select(i => i / 110.0);
             //double[] leadRadii = new double[] { 0, 0.10, 0.20, 0.5, 2.0 };
-            var leadRadii = Enumerable.Range(0, 15).Select(i => i / 80.0);
+            var leadRadii = Enumerable.Range(0, 30).Select(i => i / 110.0);
             char[] prios = new char[] { 't', 'l' };
             BSTuner[,] tunersTies = new BSTuner[tieRadii.Count(), prios.Length];
             BSTuner[,] tunersLead = new BSTuner[leadRadii.Count(), prios.Length];
 
             StreamWriter sw = new StreamWriter("../../../../../Paper/Results/params_results.csv");
-            sw.WriteLine("tieRadius;leadRadius;prio;posterior_drift;max_retuning;max_deviation;n_retunings;n_deviations");
+            sw.WriteLine("tieRadius;leadRadius;prio;posterior_drift;max_drift;max_retuning;max_deviation;n_retunings;n_deviations");
 
             for (int t = 0; t < tunersTies.GetLength(0); t++)
             {
                 for (int p = 0; p < tunersTies.GetLength(1); p++)
                 {
-                    double lR = 0.10;
+                    double lR = 0.099;
                     tunersTies[t, p] = new BSTuner(
                         tieRadius: tieRadii.ElementAt(t),
                         leadRadius: lR,
                         prio: prios[p]);
 
-                    Console.WriteLine("Now tuning with {0}; {1}; {2}", t, lR, p);
+                    Console.WriteLine("Now tuning with {0}; {1}; {2}", tieRadii.ElementAt(t), lR, prios[p]);
 
                     song = new Song(songTitle, print: false);
                     string parameters = string.Format("{0};{1};{2};", tieRadii.ElementAt(t), lR, prios[p]);
@@ -59,7 +65,7 @@ namespace AdaptiveBarbershop
                         leadRadius: tR,
                         prio: prios[p]);
 
-                    Console.WriteLine("Now tuning with {0}; {1}; {2}", tR, l, p);
+                    Console.WriteLine("Now tuning with {0}; {1}; {2}", tR, leadRadii.ElementAt(l), prios[p]);
 
                     song = new Song(songTitle, print: false);
                     string parameters = string.Format("{0};{1};{2};", tR, leadRadii.ElementAt(l), prios[p]);

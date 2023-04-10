@@ -8,8 +8,6 @@ namespace AdaptiveBarbershop
 {
     class BSTuner
     {
-        // Scale for the double values used in the algorithm, usually just 1.0 (so a cent is 0.01)
-        private double halfStepSize;
         // The 4 voices in order of importance. When optimising tied notes, the lead should be
         // handled first, then the bass, then the tenor and lastly the baritone.
         private static int[] voicesOrder = new int[4] { 2, 0, 3, 1 };
@@ -25,7 +23,7 @@ namespace AdaptiveBarbershop
         private Dictionary<char, Fraction[]> tuningTables;
 
         // Initialise the tuner type, setting the global parameters
-        public BSTuner(double stepSize = 1, double tieRadius = 0.03, double leadRadius = 0.20, char prio = 't',
+        public BSTuner(double tieRadius = 0.03, double leadRadius = 0.20, char prio = 't',
             string pathMaj     = "../../../../../TuningTables/maj_lim17.txt",
             string pathMin     = "../../../../../TuningTables/min_lim7.txt",
             string pathDom     = "../../../../../TuningTables/maj_lim17.txt",
@@ -35,7 +33,6 @@ namespace AdaptiveBarbershop
             if (!prioTypes.Contains(prio))
                 throw new ArgumentException(prio.ToString() + " is not a valid priority type, should be either l or t");
 
-            halfStepSize = stepSize;
             priority = prio;
 
             tieRange = new Range(-tieRadius, tieRadius);
@@ -76,47 +73,11 @@ namespace AdaptiveBarbershop
             // Carry out the horizontal step for each subsequent chord
             for (int i = 1; i < song.chords.Length; i++)
             {
-                double mb = SetMasterBend(song.chords[i - 1], song.chords[i]);
+                double mb = SetMasterBend(song.chords[i - 1], song.chords[i], print);
 
                 if (analyze)
                 {
-                    song.drifts[i] = mb - song.chords[i - 1].masterBend;
-
-                    // Record all tie differences in this chord
-                    song.tieDiffs[i] = new double[4];
-                    for (int v = 0; v < 4; v++)
-                    {
-                        if (song.chords[i - 1].notes[v].tied)
-                        {
-                            Note oldNote = song.chords[i - 1].notes[v];
-                            Note newNote = song.chords[i].notes[v];
-                            double postTieDiff = (oldNote.indivBend + song.chords[i - 1].masterBend) - (newNote.indivBend + song.chords[i].masterBend);
-                            song.tieDiffs[i][v] = postTieDiff;
-                        }
-                    }
-                        
-                    // Find the biggest tie difference in this chord
-                    for (int v = 0; v < 4; v++)
-                    {
-                        Note oldNote = song.chords[i - 1].notes[v];
-                        Note newNote = song.chords[i].notes[v];
-                        if (oldNote.playing && newNote.playing)
-                        {
-                            double postTieDiff = (oldNote.indivBend + song.chords[i - 1].masterBend) - (newNote.indivBend + song.chords[i].masterBend);
-
-                            if (oldNote.tied &&
-                                (Math.Abs(postTieDiff) > Math.Abs(song.maxTieDiffs[i].Item1)))
-                            {
-                                song.maxTieDiffs[i] = (postTieDiff, v);
-                            }
-                        }
-                    }
-
-                    // Find how much the lead deviates from equal temperament
-                    Note oldLead = song.chords[i - 1].notes[2];
-                    Note newLead = song.chords[i].notes[2];
-                    double postLeadDev = (oldLead.indivBend + song.chords[i - 1].masterBend) - (newLead.indivBend + song.chords[i].masterBend);
-                    song.leadDevs[i] = postLeadDev;
+                    song.AnalyzeMasterBend(i);
                 }
 
                 if(print)
@@ -129,99 +90,6 @@ namespace AdaptiveBarbershop
                 song.WriteResults(song.songTitle + "_analysis");
             }
 
-            return analysis;
-        }
-
-        public string AnalyzeTuning(Song song)
-            /// Gives some overall statistics on how tuning this song went.
-        {
-            string analysis = "";
-
-            Console.WriteLine("--------------------------------");
-            Console.WriteLine("The song was successfully tuned. Here are some fun facts:");
-            Console.WriteLine("Overall pitch drift: {0}", song.chords[song.chords.Length - 1].masterBend);
-
-            // Find the maximum pitch drift from one chord to the next
-            double max = 0;
-            int maxIdx = 0;
-            for(int i = 0; i < song.drifts.Length; i++)
-            {
-                if (Math.Abs(song.drifts[i]) > Math.Abs(max))
-                {
-                    max = song.drifts[i];
-                    maxIdx = i;
-                }
-            }
-            if (max == 0)
-                Console.WriteLine("There was no pitch drift at all in this song!");
-            else
-                Console.WriteLine("Most dramatic pitch drift moment: {0:0.0000} when going from chord {1} ({2}) to chord {3} ({4})",
-                    max, maxIdx - 1, song.chords[maxIdx - 1], maxIdx, song.chords[maxIdx]);
-
-            analysis += string.Format("{0:0.0000};", max);
-
-            // Find the number of retuning jumps in tied notes over 3 cents
-            int retunings = 0;
-            for (int c = 0; c < song.tieDiffs.Length; c++)
-                for(int v = 0; v < 4; v++)
-                    if (song.tieDiffs[c][v] > 0.03)
-                        retunings++;
-            Console.WriteLine("Tied notes had to be retuned audibly {0} times", retunings);
-
-            // Find the biggest retuning jump in a tied note
-            max = 0;
-            maxIdx = -1;
-            int maxVoice = -1;
-            for(int c = 0; c < song.maxTieDiffs.Length; c++)
-            {
-                (double diff, int v) = song.maxTieDiffs[c];
-                if (Math.Abs(diff) > Math.Abs(max))
-                {
-                    max = diff;
-                    maxIdx = c;
-                    maxVoice = v;
-                }
-            }
-            if(maxIdx == -1)
-            {
-                Console.WriteLine("Not a single tied note had to retune, great!");
-            }
-            else
-                Console.WriteLine("Most dramatic tie change: {0:0.0000} in the {1} from chord {2} ({3}) to chord {4} ({5})",
-                max, voices[maxVoice], maxIdx - 1, song.chords[maxIdx - 1], maxIdx, song.chords[maxIdx]);
-
-            analysis += string.Format("{0:0.0000};", max);
-
-            // Find the number of retuning jumps in tied notes over 10 cents
-            int deviations = 0;
-            for (int c = 0; c < song.leadDevs.Length; c++)
-                if (song.leadDevs[c] > 0.10)
-                    deviations++;
-            Console.WriteLine("Lead intervals had to deviate audibly from ET {0} times", deviations);
-
-            // Find the biggest deviation from equal temperament in the lead voice
-            max = 0;
-            maxIdx = -1;
-            for(int c = 0; c < song.leadDevs.Length; c++)
-            {
-                if(Math.Abs(song.leadDevs[c]) > Math.Abs(max))
-                {
-                    max = song.leadDevs[c];
-                    maxIdx = c;
-                }
-            }
-            if(maxIdx == -1)
-            {
-                Console.WriteLine("Every lead interval was exactly like equal temperament, great!");
-            }
-            else
-                Console.WriteLine("Most dramatic ET deviation in the lead: {0:0.0000} from chord {1} ({2}) to chord {3} ({4})",
-                max, maxIdx - 1, song.chords[maxIdx - 1], maxIdx, song.chords[maxIdx]);
-
-            analysis += string.Format("{0:0.0000};", max);
-            analysis += string.Format("{0};{1}", retunings, deviations);
-
-            Console.WriteLine("--------------------------------");
             return analysis;
         }
 
@@ -270,10 +138,10 @@ namespace AdaptiveBarbershop
 
             Fraction interval = tuningTable[distInHalfSteps];
             // The microtonal distance between note and root in just intonation, counting upwards from root
-            double fullDist = 12 * halfStepSize * Math.Log2(interval.ToFactor());
+            double fullDist = 12 * Math.Log2(interval.ToFactor());
 
             // Return how much note should deviate from equal temperament
-            double indivBend = fullDist - distInHalfSteps * halfStepSize;
+            double indivBend = fullDist - distInHalfSteps;
             if(print)
                 Console.WriteLine("Tuning note {0} with root {1} to value {2:0.0000} using fraction {3}", note, root, indivBend, interval);
             return indivBend;
@@ -286,8 +154,6 @@ namespace AdaptiveBarbershop
             return firstChord.masterBend;
         }
 
-        // TODO this currently prioritises ties over lead, make that a parameter option by changing the order of ranges
-        // TODO optionally, add the lead functionality to the bass as well
         public double SetMasterBend(Chord prevChord, Chord currChord, bool print = false)
         {
             // Make a list of note indices that have a tie property, ordered like voicesOrder
@@ -320,35 +186,41 @@ namespace AdaptiveBarbershop
             // Option 1: all can be optimised by setting the masterBend to 0
             if (tieDiffs.All(diff => tieRange.Contains(diff)) && leadRange.Contains(leadDiff))
             {
+                if (print)
+                    Console.WriteLine("0 is in all ranges, setting master bend to 0");
                 currChord.masterBend = 0;
                 return 0;
             }
             // Option 2: pick a masterbend that is within the ranges of all tied notes and the lead interval
             else
             {
-                // ranges contains, for each tied note & lead note in these chords,
-                // its mvmnt needed to reach bottom bound (range.lower) and mvmnt needed to reach top bound (range.upper)
-                // In other words, it's the amount that the masterbend is allowed to move up and down to satisfy this note
+                // ranges contains, for each tied note & lead note in these chords, the range in which the 
+                // can move according to this note. In other words, it's the amount that the masterbend is
+                // allowed to move up and down while satisfying the lead and/or tie constraint for this note.
                 Range[] ranges = new Range[tieDiffs.Length + 1];
 
                 // Ties are more important
                 if (priority == 't')
                 {
+                    // Add ranges for tied notes
                     for (int i = 0; i < tieDiffs.Length; i++)
                     {
                         ranges[i] = tieRange.MoveBy(tieDiffs[i]);
                     }
-
+                    
+                    // Add range for the lead
                     ranges[ranges.Length - 1] = leadRange.MoveBy(leadDiff);
                 }
                 // Lead is more important
                 else
                 {
-                    ranges[ranges.Length - 1] = leadRange.MoveBy(leadDiff);
+                    // Add range for the lead
+                    ranges[0] = leadRange.MoveBy(leadDiff);
 
+                    // Add ranges for tied notes
                     for (int i = 0; i < tieDiffs.Length; i++)
                     {
-                        ranges[i] = tieRange.MoveBy(tieDiffs[i]);
+                        ranges[i + 1] = tieRange.MoveBy(tieDiffs[i]);
                     }
                 }
 
@@ -360,25 +232,25 @@ namespace AdaptiveBarbershop
                 for (int i = 1; i < ranges.Length; i++)
                 {
                     double overlapResult = Range.Distance(masterBendRange, ranges[i]);
-                    // There is overlap; continue collapsing the boundaries of masterBendRange
                     if (overlapResult == 0)
+                    // There is overlap; continue collapsing the boundaries of masterBendRange
                     {
                         masterBendRange = Range.GetOverlap(masterBendRange, ranges[i]);
                     }
+                    else if (overlapResult > 0)
                     // Range for next tied/lead note is completely above the current range
                     // Ignore pitch drift and subsequent notes, compromise with the next note
-                    else if (overlapResult > 0)
                     {
-                        if(print)
+                        if (print)
                             Console.WriteLine("Range with index {0} cannot be satisfied, choosing the highest possible masterBend.", i);
                         currChord.masterBend = masterBendRange.upper;
                         return masterBendRange.upper;
                     }
+                    else
                     // Range for next tied/lead note is completely below the current range
                     // Ignore pitch drift and subsequent notes, compromise with the next note
-                    else
                     {
-                        if(print)
+                        if (print)
                             Console.WriteLine("Range with index {0} cannot be satisfied, choosing the lowest possible masterBend.", i);
                         currChord.masterBend = masterBendRange.lower;
                         return masterBendRange.lower;
@@ -401,10 +273,10 @@ namespace AdaptiveBarbershop
                     return masterBendRange.upper;
                 }
                 else
+                // This should be unreachable code, since we covered this in option 1
                 {
-                    // This should be unreachable code, since we covered this in option 1
-                    if(print)
-                        Console.WriteLine("Warning: reached code that should be unreachable in getMasterBend()");
+                    if (print)
+                        Console.WriteLine("Warning: reached code that should be unreachable in SetMasterBend()");
                     currChord.masterBend = 0;
                     return 0;
                 }
@@ -421,7 +293,7 @@ namespace AdaptiveBarbershop
             int midiNoteBend = (int)(8192 + Math.Round(fullNoteBend * 4096));
 
             // MIDI maximum bend range is 2 half steps. If the bend exceeds that, just send a different MIDI noteID
-            // TODO this doesn't quite work yet
+            // I'm not 100% sure about this code
             if (midiNoteBend >= 16383 || midiNoteBend < 0)
             {
                 int distInHalfSteps = (midiNoteBend - 8192) / 4086; // 4086 = 1 semitone
@@ -435,6 +307,101 @@ namespace AdaptiveBarbershop
                 throw new ArgumentOutOfRangeException("Too much bend!!");
             
             return (ushort)midiNoteBend;
+        }
+
+        public string AnalyzeTuning(Song song)
+        /// Gives some overall statistics on how tuning this song went.
+        {
+            string analysis = "";
+
+            Console.WriteLine("--------------------------------");
+            Console.WriteLine("The song was successfully tuned. Here are some fun facts:");
+            Console.WriteLine("Overall pitch drift: {0:0.0000}", song.chords[song.chords.Length - 1].masterBend);
+
+            analysis += string.Format("{0:0.0000};", song.chords[song.chords.Length - 1].masterBend);
+
+            // Find the maximum pitch drift from one chord to the next
+            double max = 0;
+            int maxIdx = 0;
+            for (int i = 0; i < song.drifts.Length; i++)
+            {
+                if (Math.Abs(song.drifts[i]) > Math.Abs(max))
+                {
+                    max = song.drifts[i];
+                    maxIdx = i;
+                }
+            }
+            if (max == 0)
+                Console.WriteLine("There was no pitch drift at all in this song!");
+            else
+                Console.WriteLine("Most dramatic pitch drift moment: {0:0.0000} when going from chord {1} ({2}) to chord {3} ({4})",
+                    max, maxIdx - 1, song.chords[maxIdx - 1], maxIdx, song.chords[maxIdx]);
+
+            analysis += string.Format("{0:0.0000};", max);
+
+            // Find the number of retuning jumps in tied notes over 3 cents
+            int retunings = 0;
+            for (int c = 0; c < song.tieDiffs.Length; c++)
+                for (int v = 0; v < 4; v++)
+                    if (song.tieDiffs[c][v] > 0.03)
+                        retunings++;
+            Console.WriteLine("Tied notes had to be retuned audibly {0} times", retunings);
+
+            // Find the biggest retuning jump in a tied note
+            max = 0;
+            maxIdx = -1;
+            int maxVoice = -1;
+            for (int c = 0; c < song.maxTieDiffs.Length; c++)
+            {
+                (double diff, int v) = song.maxTieDiffs[c];
+                if (Math.Abs(diff) > Math.Abs(max))
+                {
+                    max = diff;
+                    maxIdx = c;
+                    maxVoice = v;
+                }
+            }
+            if (maxIdx == -1)
+            {
+                Console.WriteLine("Not a single tied note had to retune, great!");
+            }
+            else
+                Console.WriteLine("Most dramatic tie change: {0:0.0000} in the {1} from chord {2} ({3}) to chord {4} ({5})",
+                max, voices[maxVoice], maxIdx - 1, song.chords[maxIdx - 1], maxIdx, song.chords[maxIdx]);
+
+            analysis += string.Format("{0:0.0000};", max);
+
+            // Find the number of deviations from equal temperament in the lead over 10 cents
+            int deviations = 0;
+            for (int c = 0; c < song.leadDevs.Length; c++)
+                if (song.leadDevs[c] > 0.10)
+                    deviations++;
+            Console.WriteLine("Lead intervals had to deviate audibly from ET {0} times", deviations);
+
+            // Find the biggest deviation from equal temperament in the lead voice
+            max = 0;
+            maxIdx = -1;
+            for (int c = 0; c < song.leadDevs.Length; c++)
+            {
+                if (Math.Abs(song.leadDevs[c]) > Math.Abs(max))
+                {
+                    max = song.leadDevs[c];
+                    maxIdx = c;
+                }
+            }
+            if (maxIdx == -1)
+            {
+                Console.WriteLine("Every lead interval was exactly like equal temperament, great!");
+            }
+            else
+                Console.WriteLine("Most dramatic ET deviation in the lead: {0:0.0000} from chord {1} ({2}) to chord {3} ({4})",
+                max, maxIdx - 1, song.chords[maxIdx - 1], maxIdx, song.chords[maxIdx]);
+
+            analysis += string.Format("{0:0.0000};", max);
+            analysis += string.Format("{0};{1}", retunings, deviations);
+
+            Console.WriteLine("--------------------------------");
+            return analysis;
         }
 
         public void RandomlyAssignIndivBends(Chord chord, double bendRange = 0.3)
@@ -461,14 +428,16 @@ namespace AdaptiveBarbershop
         }
 
         public bool Contains(double x)
+            /// Determines whether a number is within this range
         {
-            return (x >= lower && x <= upper);
+            return (x >= lower - 0.0000001 && x <= upper + 0.0000001);
         }
 
-        // Returns 'o' if r1 and r2 overlap; 'h' if r2 is completely above r1; 'l' if r2 is completely below r1.
         public static double Distance(Range r1, Range r2)
+            /// Returns the distance between two ranges if they don't overlap,
+            /// or 0 if they do overlap.
         {
-            if (r2.lower <= r1.upper && r2.upper >= r1.lower)
+            if (r2.lower <= r1.upper + 0.0000001 && r2.upper >= r1.lower - 0.0000001)
             {
                 return 0;
             }
