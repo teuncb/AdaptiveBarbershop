@@ -22,7 +22,13 @@ namespace AdaptiveBarbershop
             BSTuner[,] tunersLead = new BSTuner[leadRadii.Count(), prios.Length];
 
             StreamWriter sw = new StreamWriter("../../../../../Paper/Results/params_results.csv");
-            sw.WriteLine("tieRadius;leadRadius;prio;posterior_drift;max_drift;max_retuning;max_deviation;n_retunings;n_deviations");
+            sw.WriteLine(
+                "tieRadius;leadRadius;prio;" +
+                "posterior_drift;" +
+                "max_drift;max_retuning;max_deviation;" +
+                "total_drift;total_retuning;total_deviation;" +
+                "n_retunings;n_deviations"
+                );
 
             for (int t = 0; t < tunersTies.GetLength(0); t++)
             {

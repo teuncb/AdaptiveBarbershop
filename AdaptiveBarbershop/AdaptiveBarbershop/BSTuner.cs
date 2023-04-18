@@ -320,17 +320,21 @@ namespace AdaptiveBarbershop
 
             analysis += string.Format("{0:0.0000};", song.chords[song.chords.Length - 1].masterBend);
 
-            // Find the maximum pitch drift from one chord to the next
+            // Find the maximum and total pitch drift from one chord to the next
             double max = 0;
             int maxIdx = 0;
-            for (int i = 0; i < song.drifts.Length; i++)
+            double totalDrift = 0;
+            for (int c = 0; c < song.drifts.Length; c++)
             {
-                if (Math.Abs(song.drifts[i]) > Math.Abs(max))
+                totalDrift += song.drifts[c];
+                if (Math.Abs(song.drifts[c]) > Math.Abs(max))
                 {
-                    max = song.drifts[i];
-                    maxIdx = i;
+                    max = song.drifts[c];
+                    maxIdx = c;
                 }
             }
+
+            Console.WriteLine("Total pitch drift: {0:0.0000}", totalDrift);
             if (max == 0)
                 Console.WriteLine("There was no pitch drift at all in this song!");
             else
@@ -339,13 +343,18 @@ namespace AdaptiveBarbershop
 
             analysis += string.Format("{0:0.0000};", max);
 
-            // Find the number of retuning jumps in tied notes over 3 cents
+            // Find the number of retuning jumps in tied notes over 3 cents, and the total tie retuning
             int retunings = 0;
+            double totalTie = 0;
             for (int c = 0; c < song.tieDiffs.Length; c++)
                 for (int v = 0; v < 4; v++)
+                {
+                    totalTie += song.tieDiffs[c][v];
                     if (song.tieDiffs[c][v] > 0.03)
                         retunings++;
+                }
             Console.WriteLine("Tied notes had to be retuned audibly {0} times", retunings);
+            Console.WriteLine("Total tie retuning: {0:0.0000}", totalTie);
 
             // Find the biggest retuning jump in a tied note
             max = 0;
@@ -373,10 +382,15 @@ namespace AdaptiveBarbershop
 
             // Find the number of deviations from equal temperament in the lead over 10 cents
             int deviations = 0;
+            double totalLead = 0;
             for (int c = 0; c < song.leadDevs.Length; c++)
+            {
+                totalLead += song.leadDevs[c];
                 if (song.leadDevs[c] > 0.10)
                     deviations++;
+            }
             Console.WriteLine("Lead intervals had to deviate audibly from ET {0} times", deviations);
+            Console.WriteLine("Total lead deviation: {0:0.0000}", totalLead);
 
             // Find the biggest deviation from equal temperament in the lead voice
             max = 0;
@@ -398,7 +412,8 @@ namespace AdaptiveBarbershop
                 max, maxIdx - 1, song.chords[maxIdx - 1], maxIdx, song.chords[maxIdx]);
 
             analysis += string.Format("{0:0.0000};", max);
-            analysis += string.Format("{0};{1}", retunings, deviations);
+            analysis += string.Format("{0:0.0000};{1:0.0000};{2:0.0000};", totalDrift, totalTie, totalLead); // Total drift, retuning, deviation
+            analysis += string.Format("{0};{1}", retunings, deviations); // Number of retunings and deviations
 
             Console.WriteLine("--------------------------------");
             return analysis;
