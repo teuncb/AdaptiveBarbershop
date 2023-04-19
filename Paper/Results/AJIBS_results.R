@@ -63,10 +63,14 @@ plot(datTiesT$tieRadius, datTiesT$n_deviations, pch = pch_dev, col = col_dev,
 lines(datTiesT$tieRadius, datTiesT$n_deviations, col = col_dev)
 axis(side=4, at = pretty(range(datTiesT$n_retunings)), col=col_retdev, col.axis=col_retdev)
 mtext("posterior drift (c)", col = col_drift, side = 2, line = 3)
-mtext(expression("n of audible retunings /" * phantom(" deviations")), side = 4, line = 3, col=col_ret)
-mtext(expression(phantom("n of audible retunings /") * " deviations"), side = 4, line = 3, col=col_dev)
-mtext("tieRange (c)", side = 1, line = 3)
+mtext(expression("n of " * phantom("audible retunings") * " / " * phantom("deviations")), side = 4, line = 3, col=col_retdev)
+mtext(expression(phantom("n of ") * "audible retunings" * phantom(" / deviations")), side = 4, line = 3, col=col_ret)
+mtext(expression(phantom("n of audible retunings / ") * "deviations"), side = 4, line = 3, col=col_dev)
+mtext("tieRange (c)", side = 1, line = 2.5)
+legend("topright", legend="leadRange = 10 c")
 
+par(font=2)
+mtext("(a)", side = 1, line = 4)
 par(font=2, ps=title_size)
 mtext("priority = \"tie\"", side=3, line=1)
 par(font=1, ps=font_size)
@@ -92,10 +96,14 @@ plot(datTiesL$tieRadius, datTiesL$n_deviations, pch = pch_dev, col = col_dev,
 lines(datTiesL$tieRadius, datTiesL$n_deviations, col = col_dev)
 axis(side=4, at = pretty(range(datTiesT$n_retunings)), col=col_retdev, col.axis=col_retdev)
 mtext("posterior drift (c)", col = col_drift, side = 2, line = 3)
-mtext(expression("n of audible retunings /" * phantom(" deviations")), side = 4, line = 3, col=col_ret)
-mtext(expression(phantom("n of audible retunings /") * " deviations"), side = 4, line = 3, col=col_dev)
-mtext("tieRange (c)", side = 1, line = 3)
+mtext(expression("n of " * phantom("audible retunings") * " / " * phantom("deviations")), side = 4, line = 3, col=col_retdev)
+mtext(expression(phantom("n of ") * "audible retunings" * phantom(" / deviations")), side = 4, line = 3, col=col_ret)
+mtext(expression(phantom("n of audible retunings / ") * "deviations"), side = 4, line = 3, col=col_dev)
+mtext("tieRange (c)", side = 1, line = 2.5)
+legend("topright", legend="leadRange = 10 c")
 
+par(font=2)
+mtext("(b)", side = 1, line = 4)
 par(font=2, ps=title_size)
 mtext("priority = \"lead\"", side=3, line=1)
 par(font=1, ps=font_size)
@@ -122,10 +130,16 @@ plot(datLeadT$leadRadius, datLeadT$n_deviations, pch = pch_dev, col = col_dev,
 lines(datLeadT$leadRadius, datLeadT$n_deviations, col = col_dev)
 axis(side=4, at = pretty(range(datTiesT$n_retunings)), col=col_retdev, col.axis=col_retdev)
 mtext("posterior drift (c)", col = col_drift, side = 2, line = 3)
-mtext(expression("n of audible retunings /" * phantom(" deviations")), side = 4, line = 3, col=col_ret)
-mtext(expression(phantom("n of audible retunings /") * " deviations"), side = 4, line = 3, col=col_dev)
-mtext("leadRange (c)", side = 1, line = 3)
+mtext(expression("n of " * phantom("audible retunings") * " / " * phantom("deviations")), side = 4, line = 3, col=col_retdev)
+mtext(expression(phantom("n of ") * "audible retunings" * phantom(" / deviations")), side = 4, line = 3, col=col_ret)
+mtext(expression(phantom("n of audible retunings / ") * "deviations"), side = 4, line = 3, col=col_dev)
+mtext("leadRange (c)", side = 1, line = 2.5)
 
+legend("topright", legend="tieRange = 3 c")
+
+par(font=2)
+mtext("(c)", side = 1, line = 4)
+par(font=1, ps=font_size)
 
 ### BOTTOM RIGHT ###
 
@@ -148,10 +162,16 @@ plot(datLeadL$leadRadius, datLeadL$n_deviations, pch = pch_dev, col = col_dev,
 lines(datLeadL$leadRadius, datLeadL$n_deviations, col = col_dev)
 axis(side=4, at = pretty(range(datTiesT$n_retunings)), col=col_retdev, col.axis=col_retdev)
 mtext("posterior drift (c)", col = col_drift, side = 2, line = 3)
-mtext(expression("n of audible retunings /" * phantom(" deviations")), side = 4, line = 3, col=col_ret)
-mtext(expression(phantom("n of audible retunings /") * " deviations"), side = 4, line = 3, col=col_dev)
-mtext("leadRange (c)", side = 1, line = 3)
+mtext(expression("n of " * phantom("audible retunings") * " / " * phantom("deviations")), side = 4, line = 3, col=col_retdev)
+mtext(expression(phantom("n of ") * "audible retunings" * phantom(" / deviations")), side = 4, line = 3, col=col_ret)
+mtext(expression(phantom("n of audible retunings / ") * "deviations"), side = 4, line = 3, col=col_dev)
+mtext("leadRange (c)", side = 1, line = 2.5)
 
+legend("topright", legend="tieRange = 3 c")
+
+par(font=2)
+mtext("(d)", side = 1, line = 4)
+par(font=1, ps=font_size)
 
 ### LEGEND ###
 plot(1, type = "n", axes=FALSE, xlab="", ylab="")

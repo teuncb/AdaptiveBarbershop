@@ -57,6 +57,13 @@ namespace AdaptiveBarbershop
             masterBend = 0;
         }
 
+        /// <summary>
+        /// All MIDI bend values that 
+        /// </summary>
+        /// <param name="previousTies">For each Note in the previous Chord, whether it was tied over of not.</param>
+        /// <param name="firstDeltaTime">A value for how much time should be between the last Chord and this one,
+        /// only necessary if the last Chord did not contain any note off messages.</param>
+        /// <returns></returns>
         public (List<ChannelEvent>, int) MidiEvents(bool[] previousTies, int firstDeltaTime = 0)
         {
             if (previousTies.Length != 4)
@@ -106,8 +113,12 @@ namespace AdaptiveBarbershop
         {
             return fullName;
         }
+
+        /// <summary>
+        /// A formatted string with bend values for each note
+        /// </summary>
+        /// <returns></returns>
         public string PrintChord()
-            /// A formatted string with bend values for each note
         {
             string result = string.Format("{0} - MB:{1:+0.0000;-0.0000;=0.0000}. Post bends:", fullName, masterBend);
             for(int i = 0; i < notes.Length; i++)

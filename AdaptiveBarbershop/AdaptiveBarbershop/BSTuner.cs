@@ -11,7 +11,7 @@ namespace AdaptiveBarbershop
         // The 4 voices in order of importance. When optimising tied notes, the lead should be
         // handled first, then the bass, then the tenor and lastly the baritone.
         private static int[] voicesOrder = new int[4] { 2, 0, 3, 1 };
-        private static string[] voices = new string[4] { "bass", "baritone", "lead", "tenor" };
+        private static string[] voiceNames = new string[4] { "bass", "baritone", "lead", "tenor" };
         // Either l for lead or t for tied notes: which one should be optimised first?
         private char priority;
         private static HashSet<char> prioTypes = new HashSet<char> { 'l', 't' };
@@ -22,7 +22,7 @@ namespace AdaptiveBarbershop
         // Maps a chord type to its array of interval ratios in just intonation
         private Dictionary<char, Fraction[]> tuningTables;
 
-        // Initialise the tuner type, setting the global parameters
+        /// Initialise the tuner type, setting the global parameters
         public BSTuner(double tieRadius = 0.03, double leadRadius = 0.20, char prio = 't',
             string pathMaj     = "../../../../../TuningTables/maj_lim17.txt",
             string pathMin     = "../../../../../TuningTables/min_lim7.txt",
@@ -46,7 +46,29 @@ namespace AdaptiveBarbershop
             tuningTables.Add('0', TuningTable(pathHalfDim));
         }
 
-        // Master method for the tuning algorithm: tunes an entire song
+        /// Initialise a table of interval fractions from a file
+        /// These are the fractions that will be used for just intonation intervals in the vertical step
+        public Fraction[] TuningTable(string tablePath)
+        {
+            // Require exactly 12 fractions
+            string[] lines = File.ReadAllLines(tablePath);
+            if (lines.Length != 12)
+            {
+                throw new FormatException(string.Format("The file {0} doesn't have exactly 12 lines, which is required", tablePath));
+            }
+
+            // Build an array of the 12 interval fractions in the file
+            Fraction[] tuningTable = new Fraction[12];
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                tuningTable[i] = new Fraction(lines[i]);
+            }
+
+            return tuningTable;
+        }
+
+        /// Master method for the tuning algorithm: tunes an entire Song
         public string TuneSong(Song song, bool analyze = true, bool print = false)
         {
             string analysis = "";
@@ -93,29 +115,7 @@ namespace AdaptiveBarbershop
             return analysis;
         }
 
-        public Fraction[] TuningTable(string tablePath)
-            /// Initialise a table of interval fractions from a file
-            /// These are the fractions that will be used for just intonation intervals in the vertical step
-        {
-            // Require exactly 12 fractions
-            string[] lines = File.ReadAllLines(tablePath);
-            if(lines.Length != 12)
-            {
-                throw new FormatException(string.Format("The file {0} doesn't have exactly 12 lines, which is required", tablePath));
-            }
-
-            // Build an array of the 12 interval fractions in the file
-            Fraction[] tuningTable = new Fraction[12];
-
-            for(int i = 0; i < lines.Length; i++)
-            {
-                tuningTable[i] = new Fraction(lines[i]);
-            }
-
-            return tuningTable;
-        }
-
-        // Vertically tunes the notes inside a chord to just intonation relative to the root
+        /// Vertically tunes the notes inside a chord to just intonation relative to the root
         public void SetIndivBends(Chord chord, bool print = false)
         {
             foreach (Note note in chord.notes)
@@ -147,13 +147,14 @@ namespace AdaptiveBarbershop
             return indivBend;
         }
 
-        // Set the masterBend for the very first Chord such that the lead sings an equal temperament note
+        /// Set the masterBend for the very first Chord such that the lead sings an equal temperament note
         public double InitialMasterBend(Chord firstChord)
         {
             firstChord.masterBend = -firstChord.notes[2].indivBend;
             return firstChord.masterBend;
         }
 
+        /// Horizontally tunes each Chord to optimise the tie, lead and drift constraints of the algorithm
         public double SetMasterBend(Chord prevChord, Chord currChord, bool print = false)
         {
             // Make a list of note indices that have a tie property, ordered like voicesOrder
@@ -282,8 +283,9 @@ namespace AdaptiveBarbershop
                 }
             }
         }
+
+        /// Given a masterBend en indivBend, adds the two and maps it to the range in the actual MIDI format
         public static ushort MIDIBend(double masterBend, Note note)
-            /// Given a masterBend en indivBend, adds the two and maps it to the range in the actual MIDI format
         {
             if (!note.playing)
                 return 0;
@@ -309,8 +311,8 @@ namespace AdaptiveBarbershop
             return (ushort)midiNoteBend;
         }
 
-        public string AnalyzeTuning(Song song)
         /// Gives some overall statistics on how tuning this song went.
+        public string AnalyzeTuning(Song song)
         {
             string analysis = "";
 
@@ -324,9 +326,9 @@ namespace AdaptiveBarbershop
             double max = 0;
             int maxIdx = 0;
             double totalDrift = 0;
-            for (int c = 0; c < song.drifts.Length; c++)
+            for (int c = 1; c < song.drifts.Length; c++)
             {
-                totalDrift += song.drifts[c];
+                totalDrift += Math.Abs(song.drifts[c]);
                 if (Math.Abs(song.drifts[c]) > Math.Abs(max))
                 {
                     max = song.drifts[c];
@@ -349,7 +351,7 @@ namespace AdaptiveBarbershop
             for (int c = 0; c < song.tieDiffs.Length; c++)
                 for (int v = 0; v < 4; v++)
                 {
-                    totalTie += song.tieDiffs[c][v];
+                    totalTie += Math.Abs(song.tieDiffs[c][v]);
                     if (song.tieDiffs[c][v] > 0.03)
                         retunings++;
                 }
@@ -376,7 +378,7 @@ namespace AdaptiveBarbershop
             }
             else
                 Console.WriteLine("Most dramatic tie change: {0:0.0000} in the {1} from chord {2} ({3}) to chord {4} ({5})",
-                max, voices[maxVoice], maxIdx - 1, song.chords[maxIdx - 1], maxIdx, song.chords[maxIdx]);
+                max, voiceNames[maxVoice], maxIdx - 1, song.chords[maxIdx - 1], maxIdx, song.chords[maxIdx]);
 
             analysis += string.Format("{0:0.0000};", max);
 
@@ -385,7 +387,7 @@ namespace AdaptiveBarbershop
             double totalLead = 0;
             for (int c = 0; c < song.leadDevs.Length; c++)
             {
-                totalLead += song.leadDevs[c];
+                totalLead += Math.Abs(song.leadDevs[c]);
                 if (song.leadDevs[c] > 0.10)
                     deviations++;
             }
@@ -419,9 +421,9 @@ namespace AdaptiveBarbershop
             return analysis;
         }
 
-        public void RandomlyAssignIndivBends(Chord chord, double bendRange = 0.3)
         /// Given a bend range as a fraction of a half step, randomly assign individual bends to each note in a chord
         /// This function was mostly useful for debugging
+        public void RandomlyAssignIndivBends(Chord chord, double bendRange = 0.3)
         {
             Random random = new Random();
 
@@ -442,15 +444,15 @@ namespace AdaptiveBarbershop
             upper = u;
         }
 
+        /// Determines whether a number is within this range
         public bool Contains(double x)
-            /// Determines whether a number is within this range
         {
             return (x >= lower - 0.0000001 && x <= upper + 0.0000001);
         }
 
+        /// Returns the distance between two ranges if they don't overlap,
+        /// or 0 if they do overlap.
         public static double Distance(Range r1, Range r2)
-            /// Returns the distance between two ranges if they don't overlap,
-            /// or 0 if they do overlap.
         {
             if (r2.lower <= r1.upper + 0.0000001 && r2.upper >= r1.lower - 0.0000001)
             {
@@ -468,7 +470,7 @@ namespace AdaptiveBarbershop
             }
         }
 
-        // Check whether two ranges overlap and return the overlapping part
+        /// Checks whether two ranges overlap and return the overlapping part
         public static Range GetOverlap(Range r1, Range r2)
         {
             if (r1.lower > r1.upper || r2.lower > r2.upper)
@@ -490,7 +492,8 @@ namespace AdaptiveBarbershop
                 throw new ArgumentException("These two ranges do not overlap.");
             }
         }
-        // Move both bounds of a Range up by a given distance
+
+        /// Moves both bounds of a Range up by a given distance
         public Range MoveBy(double distance)
         {
             Range res = this;
@@ -499,7 +502,7 @@ namespace AdaptiveBarbershop
             return res;
         }
 
-        // Define equality operators for the Range struct
+        /// Define equality operators for the Range struct
         public static bool operator ==(Range r1, Range r2)
         {
             return r1.upper == r2.upper && r1.lower == r2.lower;

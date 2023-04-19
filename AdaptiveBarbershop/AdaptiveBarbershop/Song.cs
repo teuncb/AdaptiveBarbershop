@@ -17,8 +17,12 @@ namespace AdaptiveBarbershop
         public double[][] tieDiffs; // retuning values for each voice
         public double[] leadDevs; // deviation from ET
 
+        /// <summary>
+        /// Initialises a Song from a path in the described song language
+        /// </summary>
+        /// <param name="title">Title of the song, used for file names</param>
+        /// <param name="print">Whether to print debug messages</param>
         public Song(string title, bool print = false)
-            /// Initialises a Song from a path in the described song language
         {
             songTitle = title;
             string path = "../../../../../Songs/" + songTitle + ".txt";
@@ -105,22 +109,18 @@ namespace AdaptiveBarbershop
                 (newLead.indivBend + chords[i].masterBend);
             leadDevs[i] = postLeadDev;
         }
-        public void WriteMidiFile(string fileName, bool overwriteFile = true)
-            /// Writes this entire song to a new MIDI file
-        {
-            string folder = "OutputMidi/";
-            string path = "../../../../../" + folder + fileName + ".mid";
-            MIDISong().Write(path, overwriteFile);
-            Console.WriteLine("Successfully wrote a MIDI file to " + folder + fileName + ".mid");
-        }
+
+        /// <summary>
+        /// Writes an analysis file for the user to examine the posterior bends for each note in the song
+        /// </summary>
+        /// <param name="fileName"></param>
         public void WriteResults(string fileName)
-            /// Writes an analysis file for the user to examine the posterior bends for each note in the song
         {
-            string folder = "OutputMidi/";
+            string folder = "Paper/Results/";
             string path = "../../../../../" + folder + fileName + ".txt";
             StreamWriter sw = new StreamWriter(path);
 
-            for(int i = 0; i < chords.Length; i++)
+            for (int i = 0; i < chords.Length; i++)
             {
                 sw.WriteLine(chords[i].PrintChord());
             }
@@ -128,11 +128,30 @@ namespace AdaptiveBarbershop
             Console.WriteLine("Successfully wrote a txt file to " + folder + fileName + ".txt");
         }
 
+        /// <summary>
+        /// Writes this entire song to a new MIDI file
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="overwriteFile"></param>
+        public void WriteMidiFile(string fileName, bool overwriteFile = true)
+        {
+            string folder = "OutputMidi/";
+            string path = "../../../../../" + folder + fileName + ".mid";
+            MIDISong().Write(path, overwriteFile);
+            Console.WriteLine("Successfully wrote a MIDI file to " + folder + fileName + ".mid");
+        }
+
+        /// <summary>
+        /// Creates a MIDI file out of this Song.
+        /// </summary>
+        /// <param name="tempo">MIDI tempo in microseconds per quarter note.</param>
+        /// <param name="instrument">The number of the MIDI instrument to use.</param>
+        /// <returns></returns>
         public MidiFile MIDISong(int tempo = 150000, int instrument = 72)
         {
             List<MidiEvent> events = new List<MidiEvent>();
 
-            // Make everyone sound like saxophones
+            // Make everyone sound like clarinets
             List<MidiEvent> instrumentEvents = new List<MidiEvent>(){
                 new ProgramChangeEvent((SevenBitNumber)instrument) { Channel = (FourBitNumber)0 },
                 new ProgramChangeEvent((SevenBitNumber)instrument) { Channel = (FourBitNumber)1 },
@@ -146,12 +165,12 @@ namespace AdaptiveBarbershop
             events.AddRange(newEvents);
 
             // Add all pitch bend, note-on and note-off events from each chord to a big List
-            for(int i = 1; i < chords.Length; i++)
+            for (int i = 1; i < chords.Length; i++)
             {
                 // The current chord needs to know which notes were tied in the previous chord
                 // The notes in previousTies don't get new note-on messages
                 bool[] previousTies = new bool[4];
-                for(int j = 0; j < previousTies.Length; j++)
+                for (int j = 0; j < previousTies.Length; j++)
                 {
                     previousTies[j] = chords[i - 1].notes[j].tied;
                 }

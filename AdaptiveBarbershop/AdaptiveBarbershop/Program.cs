@@ -21,7 +21,9 @@ namespace AdaptiveBarbershop
             BSTuner[,] tunersTies = new BSTuner[tieRadii.Count(), prios.Length];
             BSTuner[,] tunersLead = new BSTuner[leadRadii.Count(), prios.Length];
 
-            StreamWriter sw = new StreamWriter("../../../../../Paper/Results/params_results.csv");
+            string rootPath = "../../../../../";
+            string csvPath = "Paper/Results/params_results.csv";
+            StreamWriter sw = new StreamWriter(rootPath + csvPath);
             sw.WriteLine(
                 "tieRadius;leadRadius;prio;" +
                 "posterior_drift;" +
@@ -83,6 +85,7 @@ namespace AdaptiveBarbershop
 
             sw.Close();
 
+            Console.WriteLine("Wrote analysis data to {0}", csvPath);
             Console.WriteLine("Success!");
             Console.ReadLine();
 
