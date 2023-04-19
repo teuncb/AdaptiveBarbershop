@@ -9,6 +9,8 @@
 \usepackage[toc,page]{appendix}
 \usepackage{dirtytalk} % Typesetting quotations
 \MakeRobust{\say} % making dirtytalk not horrible
+%\usepackage[htt]{hyphenat} % allow hyphenation of texttt
+% \usepackage{microtype} % might solve texttt line breaks
 
 % Times font
 \usepackage{mathptmx}
@@ -152,7 +154,7 @@ This thesis will propose an algorithm that adaptively tunes notes in barbershop 
 
 The input of the algorithm is basically the score of a barbershop song. Additionally, the music is tagged with information about the intended harmonies, as those can be relevant for tuning. The output is a tuning for every note that optimises the above four constraints.
 
-The the C$\sharp$ implementation, the input should be written in \verb+.txt+-files using a newly-defined language. The language is described in Appendix \ref{input}. Importantly, the input splits the score into \textit{Chords}, which in this case are periods of time where none of the notes change. A new Chord begins any time one of the four voices stops singing, starts singing or moves to a different pitch. Figure \ref{fig:algo_outline} visualises such a split score. Because of this newly-defined language, a parser must be programmed to convert the input \verb+.txt+ files into the program's internal data structure. Conversion from the original sheet music to the input language is, for now, a human job.
+The the C$\sharp$ implementation, the input should be written in \texttt{.txt}-files using a newly-defined language. The language is described in Appendix \ref{input}. Importantly, the input splits the score into \textit{Chords}, which in this case are periods of time where none of the notes change. A new Chord begins any time one of the four voices stops singing, starts singing or moves to a different pitch. Figure \ref{fig:algo_outline} visualises such a split score. Because of this newly-defined language, a parser must be programmed to convert the input \texttt{.txt} files into the program's internal data structure. Conversion from the original sheet music to the input language is, for now, a human job.
 % TODO betere figuur hier
 
 The output of the C$\sharp$ consists of a MIDI file \cite{midi_manufacturers_association_complete_2014} and some general statistics such as how much the song had to drift in general and which chords caused the most dramatic retunings. The MIDI files mostly contain the original notes from the score, now preceded by pitch bend messages. Section \ref{implementation} will describe the MIDI conversion in further detail.
@@ -183,31 +185,36 @@ Ultimately, the algorithm's results depend on a set of parameters given by the u
 
 \section{C$\sharp$ Implementation}
 \label{implementation}
-Now that Section \ref{algorithm} has described the just intonation algorithm for barbershop music, we can look at how the algorithm was implemented into the programming language C$\sharp$. This section therefore answers research question B: {\it can we implement the tuning system from question A so that it models the ideal barbershop quartet?}
+Now that Section \ref{algorithm} has described the just intonation algorithm for barbershop music, we can look at how the algorithm was implemented into the programming language C$\sharp$. This section therefore answers research question B: {\it can we implement the tuning system from question A so that it models the ideal barbershop quartet?} The result of this section is a C$\sharp$ program that takes a song as a \texttt{.txt} file written in the language defined in Appendix \ref{input} as input and outputs a MIDI file which represents the same songs, now with added pitch bend information. All code can be found on this thesis' \texttt{\href{https://GitHub.com/teuncb/AdaptiveBarbershop}{GitHub repository}}.
 
-\textit{\color{red}Dit moet ik nog schrijven. Als jullie deze week al vragen hebben over de implementatie hoor ik het graag!}
+The implementation consists of five classes: \texttt{Note}, \texttt{Chord}, \texttt{Song}, \texttt{BSTuner} and \texttt{Program}. Additionally, two new structs are essential to the algorithm's workings: \texttt{Fraction} (vertical step) and \texttt{Range} (horizontal step). \texttt{Note}, \texttt{Chord} and \texttt{Song} together form the internal representation of a Barbershop song. A \texttt{Song} contains an array of \texttt{Chord}s, which in turn contains an array of exactly four \texttt{Note}s - if a part is silent in a \texttt{Chord}, its \texttt{Note}'s \texttt{playing} property is simply set to \texttt{false}. \texttt{BSTuner} contains the core of the algorithm and operates on a \texttt{Song} to tune the notes it contains. \texttt{Program} contains the \texttt{Main} method and serves as an interface for the program.
 
-% Classes: Notes with indivBend, Chords with masterBend, Song and BSTuner to tie it all together
-% Vertical step implementation, \ref{input_fractions}
-% Horizontal step implementation w/ pseudocode
-% MIDI (and analysis) output, with library DryWetMidi: 4 bend messages on each Chord
+\begin{sloppypar}
+The vertical step of the algorithm is basically carried out by \texttt{BSTuner.SetIndivBends} and \texttt{BSTuner.GetIndivBend}, which set the \texttt{indivBend} property for each \texttt{Note} in a \texttt{Chord}. This \texttt{indivBend} property never changes again, meaning the logarithmic distance between the chord notes remains the same and therefore the just intonation constraint is always satisfied. The methods for the vertical step use the \texttt{Fraction} struct, which represents a frequency ratio as described in Paragraph \ref{intro_ji}, relative to the chord root. The \texttt{Fraction}s used by the algorithm depend on the user input of the chord and chord type. The exact frequency ratios to use can be determined by the user in \texttt{.txt} files, as described in Appendix \ref{input_fractions}.
+
+The horizontal step of the algorithm is basically carried out by \texttt{BSTuner.SetMasterBend}, which sets the \texttt{masterBend} property for a \texttt{Chord}. The input for this method includes the $\mathit{tieRange}$, $\mathit{leadRange}$ and $\mathit{priority}$ parameters. $\mathit{tieRange}$ and $\mathit{leadRange}$ represent how \say{out of tune} the new intervals can be while satisfying the tie and lead constraints, respectively. $\mathit{priority}$ prescribes which of the two constraints should be satisfied first. To achieve this optimisation of constraints, \texttt{SetMasterBend} uses the \texttt{Range} struct, which represents a range of bend values (represented logarithmically, in equal temperament semitones). \texttt{Range}s are used to find a \texttt{masterBend} that satisfies the lead, tie and drift constraints for this \texttt{Chord}.
+\end{sloppypar}
+
+Pseudocode for the horizontal step can be found in Figure \ref{fig:pseudocodeH}. The master bend method intersects ranges with each other until no overlap can be found. If all ranges overlap, \texttt{masterBend} can be set to the closest number to 0, meaning the amount of tonal centre drift has been minimised while all other constraints are satisfied as well. If one note's range does not overlap with the current range, the function ends by returning a \texttt{masterBend} within the current range that is closest to the unsatisfiable range, ignoring the drift constraint.
+
+After the entire \texttt{Song} has been tuned, \texttt{Song.MIDISong} and \texttt{Song.WriteMidiFile} create a MIDI file out of it using the DryWetMidi library \cite{dobroselsky_melanchalldrywetmidi_2023}. Each voice gets its own channel, meaning pitch bend messages only apply to a single voice. Every single \texttt{Chord} gets four pitch bend messages. The bend value for these messages gets calculated by adding the \texttt{Note}'s \texttt{indivBend} to the \texttt{Chord}'s \texttt{masterBend}. Since MIDI bend values only go up to two semitones, the MIDI key for a note may be changed if its bend value exceeds 2 semitones.
 
 \begin{figure}
 	\begin{algorithmic}[1]
 		\Procedure{SetMasterBend}{$\mathit{MB}_{i-1}, \mathit{Notes}_{i-1}, \mathit{Notes}_i, \mathit{tieRange}, \mathit{leadRange}, \mathit{priority}$}
 		\State $\mathit{ties} \gets [$all notes in $\mathit{Notes}_{i-1}$ that have the tie property, ordered lead-bass-tenor-baritone$]$
 		
-		\State $\mathit{ranges} \gets [$an empty list$]$
-		\State {\bf In order of} $\mathit{priority}$:
+		\State $\mathit{ranges} \gets [$an empty list of ranges$]$
+		\State {\bf in order of} $\mathit{priority}$:
 		
-		\IndState $\mathit{ranges}.Add[$for all tied notes, the range $\mathit{MB}_i$ could move into in order to satisfy its parameter$]$
+		\IndState $\mathit{ranges}.Add[$for all tied notes, the range $\mathit{MB}_i$ could move into in order to satisfy $\mathit{tieRange}$ for this note$]$
 		\IndState $\mathit{ranges.Add}($the range in which $\mathit{MB}_i$ could move according to $\mathit{leadRange})$
 		
 		\If{0 is within $\bigcap \mathit{ranges}$}
 		\State\Return{$\mathit{MB}_i \gets 0$}
 		\Else
-		\State $\mathit{currRange} \gets \mathit{ranges}[0]$
-		\ForAll{$\mathit{range} \; r \; in \;  \mathit{ranges}[1:]$}
+		\State $\mathit{currRange} \gets \mathit{ranges}$[0]
+		\ForAll{$\mathit{range} \; r \; in \;  \mathit{ranges}$[1:]}
 		\State $\mathit{overlap} \gets r \cap \mathit{currRange}$
 		\If{$\mathit{overlap} == \emptyset$}
 			\State \Return{$\mathit{MB}_i \gets$ the number closest to $r$ within $\mathit{currRange}$}
@@ -220,7 +227,8 @@ Now that Section \ref{algorithm} has described the just intonation algorithm for
 		\EndIf
 		\EndProcedure
 	\end{algorithmic}
-	\caption{Pseudocode for the horizontal step. The input is two Chords, both of which contain four notes. The output is a master bend value for the current chord which takes the tie, lead and drift constraints into account. The just intonation constraint has already been completely satisfied by the vertical step. $\mathit{MB}_i$ refers to the master bend of chord $i$, relative to equal temperament. \textit{\color{red}Hier komt nog meer uitleg, hoort bij het implementatie-hoofdstuk}}
+	% TODO is dit genoeg uitleg?
+	\caption{Pseudocode for the horizontal step. The input is two Chords, both of which contain four notes. The output is a master bend value for the current chord which takes the tie, lead and drift constraints into account. $\mathit{MB}_i$ refers to the master bend of chord $i$, relative to equal temperament. The just intonation constraint has already been completely satisfied by the vertical step. Because this method compromises between the current range and the next once no overlap can be found, the drift constraint (Section \ref{methodoloy}) may be ignored if other constraints are not compatible with each other.}
 	\label{fig:pseudocodeH}
 \end{figure}
 
@@ -264,6 +272,7 @@ The plots show that tonal centre drift is negatively correlated with both $\math
 Research question A was: {\it what adaptive tuning algorithm would a mathematically ideal barbershop quartet follow, given a score?} In this thesis project, an algorithm was proposed as the ideal tuning system for barbershop quartets, immediately approaching an answer to this question. The results show that there is no definitive answer to question A; it is impossible to tune the \textit{Ring-a Ding Ding} tag in such a way that all four constraints from Section \ref{methodoloy} are completely satisfied. However, the proposed algorithm successfully optimises the four constraints according to given priorities. Note that the just intonation constraint is always the top priority of this algorithm, meaning it is not possible to compromise how much any passing chord is in tune using this algorithm.
 
 % TODO: meer discussie over algoritme, zie Peter: Wat zijn de beperkingen? Wat zijn de eigenschappen? Etc.
+% Daar hoort bij: JI altijd geslaagd, lead altijd geslaagd als prioriteit lead is, twee ties tegelijk kan nog wel eens stomme resultaten opleveren
 
 % Antwoord vraag B: is het succesvol geïmplementeerd? Ja!
 Research question B was: {\it can we implement the tuning system from question A so that it models the ideal barbershop quartet?} The algorithm was successfully implemented in C$\sharp$, making the answer to question B a definitive yes. Of course, whether this implemented algorithm sounds like the perfect barbershop quartet is a matter of opinion. Nonetheless, since every chord is in just intonation and overall pitch drift can be kept to a minimum, it can be said that this algorithm poses a \textit{mathematically ideal} solution to the tuning problem that is implicitly posed by the Barbershop Harmony Society's Handbook. \cite{barbershop_harmony_society_contest_2022}
