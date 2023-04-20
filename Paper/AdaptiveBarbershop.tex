@@ -44,7 +44,7 @@
 
 % TODO: Abstract
 \begin{abstract}
-	{\color{red}Hier komt dus waarschijnlijk nog een abstract.}
+	This thesis presents an adaptive just intonation algorithm for barbershop music. The first part of the research distils a mathematically ideal tuning system from the genre's conventions. The second part implements this algorithm in C$\sharp$ as a program that takes a tagged score as input and outputs a MIDI file with pitch bend messages. The proposed system provides just intonation at each moment in time and furthermore optimises three optional constraints, ordered based on parameters: having the lead voice mostly follow intervals from equal temperament, retuning held notes as little as possible and minimising tonal centre drift. Results suggest that, even though the parameters cannot all be completely optimised, the algorithm performs well on example songs. All code is publicly available on \texttt{\href{https://GitHub.com/teuncb/AdaptiveBarbershop}{GitHub}}.
 \end{abstract}
 
 \section{Introduction}
@@ -102,6 +102,7 @@ A possible solution to the fact that just intonation is impossible to achieve wi
 
 When talking about the difference between just intonation and 12-tone equal temperament, the \textit{cent} interval (c) is often used as a unit. 1 cent is defined as $\frac{1}{100}$ of a semitone in equal temperament, meaning it has a frequency ratio of $\sqrt[1200]{2}:1$. A justly tuned major third, for example, is 14 cents lower than a major third in equal temperament (Figure \ref{fig:thirdsproof}).
 
+% TODO bullets, vindt Jeroen fijn, waar nog meer?
 \textit{Note about terminology.} The addition of the cent interval leaves us with three different ways to describe a tone's exact tuning: as an absolute frequency in Hertz, as a fraction relative to a base note or as a logarithmic difference with a base note in cents. Exact frequencies are generally useful in phsics: an A3 can be tuned at 220 Hz, whereas an E4 would be tuned at 329.63 Hz on the piano. To describe just intonation, we often use fractions: when tuning an E4 to be a perfect fifth above this A3, the E4's tuning would need to be $\frac32$ times the frequency of the A3 (equivalently, 330.00 Hz). The cent interval can put exact tuning in a musical perspective by comparing to equal temperament: 330.00 Hz is 2 cents higher than 329.63 Hz, meaning $\frac{2}{100}$ of a semitone.
 
 \subsection{Adaptive Just Intonation Systems}
@@ -303,8 +304,14 @@ Even the concept of just intonation itself is a subject of debate: are the inter
 
 At the same time, it is important to note that twelve-tone bias does play a role in this article's proposed tuning system. Barbershop music is composed with the western standard division of the octave in mind, which means notes that sound the same on the piano are often meant to sound the same in singing as well. A tuning method that does not adhere to the twelve-tone system and is, therefore, more culturally independent, was proposed by Sethares. \cite{sethares_adaptive_1994} Instead of using fractions from the harmonic series, he proposes to analyse a note's timbre using its \textit{dissonance curve}. However, since the present article focuses specifically on barbershop, dissonance curves will always adhere to the natural harmonic series and using the twelve-tone system is commonplace. For these reasons, it was decided not to use Sethares' proposal in the current research.
 
-\subsection{Philosophical Framework}
-\textit{\color{red}Hier kan ik schrijven over ethische consequenties en het verschil tussen strong en weak AI. Dat ga ik alleen nog doen als ik tijd over heb.}
+\subsection{Philosophical Framework} % TODO
+% strong vs weak AI: wat het is, wat dit is en waarom, wat als dit het niet zou zijn
+% ethics: ethical concerns of computers making music: future of work (calo), maintain the legal status of tools (fjeld), achievement gap (danaher). 
+Philosophy regarding artificial intelligence recognises two classifications of views about the future of the technology: \textit{weak AI} and \textit{strong AI}. Weak AI supposes that AI can merely exist as tools to make human lives easier, whereas strong AI also allows it to learn and understand as humans do and have other cognitive states. \cite{searle_minds_1980} Since music-making is a creative process, crossing the border of outperforming humans in music might be seen as strong AI. \cite{gottschall_rise_2015} However, when a computer is only following a set of rules without being able to add emotion, it might lack the ability to create beauty. \cite{braga_emperor_2017} The fact that the proposed algorithm in this thesis only follows rules to enrich man-made music explicitly places it in the classification of weak AI.
+
+Tools that allow computers to make music might give rise to a number of ethical concerns which are important to keep in mind during future developments. Firstly, tool-assisted art making may cause an \textit{achievement gap}, in which the connection between human effort and workplace outcome is severed, thereby undermining achievement in the workplace. \cite{danaher_automation_2021} Secondly, human control over these systems remains important. \cite{fjeld_principled_2020} The UNI Global Union prescribes that AI systems must keep the legal status of tools, meaning the responsibility stays with humans. \cite{union_top_2017} Lastly, AI systems might take over human jobs, which might have different consequences: either humans get more rewarding tasks, or human jobs completely disappear, creating the need for a universal basic income. \cite{calo_artificial_2017}
+
+The proposed algorithm alone is not enough to replace human barbershop quartets; its intended use is to serve performers with a suggestion of how to sing their repertoire. However, in combination with tools such as Synthesizer V \cite{hua_synthesizer_2020}, which can output a human-sounding performance given a score, an automatic tuning system does potentially bring the state-of-the-art one step closer to replacing human singers. Therefore, it is important to keep in mind achievement gaps, human control and the effect on the economy in further research.
 
 \subsection{Future Work}
 % MIDI Input of op z'n minst abc-notatie
