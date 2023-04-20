@@ -22,7 +22,17 @@ namespace AdaptiveBarbershop
         // Maps a chord type to its array of interval ratios in just intonation
         private Dictionary<char, Fraction[]> tuningTables;
 
-        /// Initialise the tuner type, setting the global parameters
+        /// <summary>
+        /// Initialise the tuner type, setting all global parameters for tuning.
+        /// </summary>
+        /// <param name="tieRadius">How much tied notes are allowed to retune, in semitones.</param>
+        /// <param name="leadRadius">How much lead intervals are allowed to deviate from ET intervals, in semitones.</param>
+        /// <param name="prio">Either 'l' for lead or 't' for tie: which constraint should be satisfied first?</param>
+        /// <param name="pathMaj">Path to a file with just intonation fractions to use for major (M) chords.</param>
+        /// <param name="pathMin">Path to a file with just intonation fractions to use for minor (m) chords.</param>
+        /// <param name="pathDom">Path to a file with just intonation fractions to use for dominant (7) chords.</param>
+        /// <param name="pathDim7">Path to a file with just intonation fractions to use for diminished (o) chords.</param>
+        /// <param name="pathHalfDim">Path to a file with just intonation fractions to use for half-diminished (0) chords.</param>
         public BSTuner(double tieRadius = 0.03, double leadRadius = 0.20, char prio = 't',
             string pathMaj     = "../../../../../TuningTables/maj_lim17.txt",
             string pathMin     = "../../../../../TuningTables/min_lim7.txt",
@@ -68,7 +78,13 @@ namespace AdaptiveBarbershop
             return tuningTable;
         }
 
+        /// <summary>
         /// Master method for the tuning algorithm: tunes an entire Song
+        /// </summary>
+        /// <param name="song">The Song to tune.</param>
+        /// <param name="analyze">Whether to return an analysis string (the string will be empty if false).</param>
+        /// <param name="print">Whether to print debug messages throughout the tuning process.</param>
+        /// <returns>An analysis line in CSV format, containing the information: tieRadius;leadRadius;prio;posterior_drift;max_drift;max_retuning;max_deviation;total_drift;total_retuning;total_deviation;n_retunings;n_deviations</returns>
         public string TuneSong(Song song, bool analyze = true, bool print = false)
         {
             string analysis = "";
@@ -115,7 +131,11 @@ namespace AdaptiveBarbershop
             return analysis;
         }
 
+        /// <summary>
         /// Vertically tunes the notes inside a chord to just intonation relative to the root
+        /// </summary>
+        /// <param name="chord"></param>
+        /// <param name="print"></param>
         public void SetIndivBends(Chord chord, bool print = false)
         {
             foreach (Note note in chord.notes)
@@ -127,10 +147,18 @@ namespace AdaptiveBarbershop
             }
         }
 
-        public double GetIndivBend(int note, int root, Fraction[] tuningTable, bool print = false)
+        /// <summary>
+        /// Given a note and its harmonic context, computes its individual bend value in semitones.
+        /// </summary>
+        /// <param name="noteNum">0 for c, 1 for c#, etc.</param>
+        /// <param name="root">The root of the chord this note is in.</param>
+        /// <param name="tuningTable">The fractions for this chord type.</param>
+        /// <param name="print"></param>
+        /// <returns></returns>
+        public double GetIndivBend(int noteNum, int root, Fraction[] tuningTable, bool print = false)
         {
             // The number of half steps until note is reached, counting upwards from root
-            int distInHalfSteps = note - root;
+            int distInHalfSteps = noteNum - root;
             if (distInHalfSteps < 0)
                 distInHalfSteps += 12;
             else if (distInHalfSteps >= 12)
@@ -143,7 +171,8 @@ namespace AdaptiveBarbershop
             // Return how much note should deviate from equal temperament
             double indivBend = fullDist - distInHalfSteps;
             if(print)
-                Console.WriteLine("Tuning note {0} with root {1} to value {2:0.0000} using fraction {3}", note, root, indivBend, interval);
+                Console.WriteLine("Tuning note {0} with root {1} to value {2:0.0000} using fraction {3}",
+                    noteNum, root, indivBend, interval);
             return indivBend;
         }
 
@@ -173,15 +202,11 @@ namespace AdaptiveBarbershop
             {
                 // For this tied note, get the current difference in tuning between the previous chord and the current chord
                 // currChord.masterBend should be 0, but that's been added for completeness.
-                tieDiffs[i] = 
-                    (prevChord.masterBend + prevChord.notes[ties[i]].indivBend) - 
-                    (currChord.masterBend + currChord.notes[ties[i]].indivBend);
+                tieDiffs[i] = prevChord.posteriorBend(ties[i]) - currChord.posteriorBend(ties[i]);
             }
 
             // Same difference for the lead voice
-            double leadDiff =
-                (prevChord.masterBend + prevChord.notes[2].indivBend) -
-                (currChord.masterBend + currChord.notes[2].indivBend);
+            double leadDiff = prevChord.posteriorBend(2) - currChord.posteriorBend(2);
 
             // Determine the optimal masterBend for currChord
             // Option 1: all can be optimised by setting the masterBend to 0
@@ -284,15 +309,19 @@ namespace AdaptiveBarbershop
             }
         }
 
-        /// Given a masterBend en indivBend, adds the two and maps it to the range in the actual MIDI format
-        public static ushort MIDIBend(double masterBend, Note note)
+        /// <summary>
+        /// Maps a note's posterior bend to the range in the actual MIDI format
+        /// </summary>
+        /// <param name="chord">The Chord the note is in.</param>
+        /// <param name="note">The Note to calculate the MIDI bend value of.</param>
+        /// <returns>A number between 0 and 16383, where 8192 represents a bend of 0, 16383 two semitones up and 0 two semitones down.</returns>
+        public static ushort MIDIBend(Chord chord, Note note)
         {
             if (!note.playing)
                 return 0;
 
-            double fullNoteBend = masterBend + note.indivBend;
             // Map fullNoteBend to the range 0-16383
-            int midiNoteBend = (int)(8192 + Math.Round(fullNoteBend * 4096));
+            int midiNoteBend = (int)(8192 + Math.Round(chord.posteriorBend(note) * 4096));
 
             // MIDI maximum bend range is 2 half steps. If the bend exceeds that, just send a different MIDI noteID
             // I'm not 100% sure about this code

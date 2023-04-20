@@ -25,9 +25,12 @@ namespace AdaptiveBarbershop
             { "bb", 10}, { "bn", 11}, { "b#", 12}
         };
 
+        /// <summary>
+        /// Initializes a Note from an input string as described in Appendix A of the paper.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <param name="print">Whether to print update messages in the process.</param>
         public Note(string input, bool print = false)
-            /// Initializes a Note from an input string as described in Appendix A of the paper.
-            /// <param name="print">whether to print update messages inbetween.</param>
         {
             if(input == "    ")
             {

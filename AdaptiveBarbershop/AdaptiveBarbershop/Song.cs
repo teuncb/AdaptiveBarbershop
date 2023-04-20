@@ -9,13 +9,16 @@ namespace AdaptiveBarbershop
 {
     class Song
     {
-        public Chord[] chords;
+        public Chord[] chords; // The list of Chords in this song, essentially the most important information.
+
         public string songTitle;
         public double[] drifts; // For analysis; constains the tonal centre drift for each chord change
-        // For analysis, these two arrays contain the biggest tied resp. lead note retuning for each chord change
-        public (double,int)[] maxTieDiffs; // retuning value, voice index
-        public double[][] tieDiffs; // retuning values for each voice
+
+        // For analysis, these two arrays contain for each chord change (resp.) the lead note deviation, 
+        // all tied note differences and the biggest tied note difference.
         public double[] leadDevs; // deviation from ET
+        public double[][] tieDiffs; // retuning values for each voice
+        public (double, int)[] maxTieDiffs; // retuning value, voice index
 
         /// <summary>
         /// Initialises a Song from a path in the described song language
@@ -63,6 +66,10 @@ namespace AdaptiveBarbershop
                     throw new FormatException(string.Format("Last chord cannot have tied notes"));
             }
         }
+        /// <summary>
+        /// Add recently computed bend values to this Song's lists of tieDiffs, maxTieDiffs and leadDevs.
+        /// </summary>
+        /// <param name="i"></param>
         public void AnalyzeMasterBend(int i)
         {
             drifts[i] = chords[i].masterBend - chords[i - 1].masterBend;
@@ -73,11 +80,7 @@ namespace AdaptiveBarbershop
             {
                 if (chords[i - 1].notes[v].tied)
                 {
-                    Note oldNote = chords[i - 1].notes[v];
-                    Note newNote = chords[i].notes[v];
-                    double postTieDiff = 
-                        (oldNote.indivBend + chords[i - 1].masterBend) - 
-                        (newNote.indivBend + chords[i].masterBend);
+                    double postTieDiff = chords[i - 1].posteriorBend(v) - chords[i].posteriorBend(v);
                     tieDiffs[i][v] = postTieDiff;
                 }
             }
@@ -89,9 +92,7 @@ namespace AdaptiveBarbershop
                 Note newNote = chords[i].notes[v];
                 if (oldNote.playing && newNote.playing)
                 {
-                    double postTieDiff = 
-                        (oldNote.indivBend + chords[i - 1].masterBend) - 
-                        (newNote.indivBend + chords[i].masterBend);
+                    double postTieDiff = chords[i - 1].posteriorBend(v) - chords[i].posteriorBend(v);
 
                     if (oldNote.tied &&
                         (Math.Abs(postTieDiff) > Math.Abs(maxTieDiffs[i].Item1)))
@@ -102,11 +103,7 @@ namespace AdaptiveBarbershop
             }
 
             // Find how much the lead deviates from equal temperament
-            Note oldLead = chords[i - 1].notes[2];
-            Note newLead = chords[i].notes[2];
-            double postLeadDev = 
-                (oldLead.indivBend + chords[i - 1].masterBend) - 
-                (newLead.indivBend + chords[i].masterBend);
+            double postLeadDev = chords[i - 1].posteriorBend(2) - chords[i].posteriorBend(2);
             leadDevs[i] = postLeadDev;
         }
 
@@ -179,6 +176,7 @@ namespace AdaptiveBarbershop
                 events.AddRange(newEvents);
             }
 
+            // Create the actual MIDI file using the newly-created List of events.
             MidiFile songFile = new MidiFile(
                 new TrackChunk(
                     new SetTempoEvent(tempo)

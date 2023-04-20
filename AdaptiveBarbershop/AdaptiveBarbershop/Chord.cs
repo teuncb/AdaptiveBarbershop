@@ -56,14 +56,32 @@ namespace AdaptiveBarbershop
             duration = int.Parse(portions[5]);
             masterBend = 0;
         }
+        /// <summary>
+        /// Returns the sum of this chord's masterBend and the indivBend of note i.
+        /// </summary>
+        /// <param name="i">Index of the note to compute the posterior bend of.</param>
+        /// <returns></returns>
+        public double posteriorBend(int i)
+        {
+            return masterBend + notes[i].indivBend;
+        }
+        /// <summary>
+        /// Returns the sum of this chord's masterBend and the indivBend of the given note.
+        /// </summary>
+        /// <param name="note"></param>
+        /// <returns></returns>
+        public double posteriorBend(Note note)
+        {
+            return masterBend + note.indivBend;
+        }
 
         /// <summary>
-        /// All MIDI bend values that 
+        /// A list of MIDI Channel events for the notes in this chord.
         /// </summary>
         /// <param name="previousTies">For each Note in the previous Chord, whether it was tied over of not.</param>
         /// <param name="firstDeltaTime">A value for how much time should be between the last Chord and this one,
         /// only necessary if the last Chord did not contain any note off messages.</param>
-        /// <returns></returns>
+        /// <returns>A pair containing the list of MIDI events and, optionally, what the delta time for the first next MIDI event should be.</returns>
         public (List<ChannelEvent>, int) MidiEvents(bool[] previousTies, int firstDeltaTime = 0)
         {
             if (previousTies.Length != 4)
@@ -71,12 +89,13 @@ namespace AdaptiveBarbershop
 
             List<ChannelEvent> events = new List<ChannelEvent>();
 
-            // Add pitch bends
-            events.Add(new PitchBendEvent(BSTuner.MIDIBend(masterBend, notes[0]))
+            // Add pitch bend for the first note separately, because it might require a special delta time
+            events.Add(new PitchBendEvent(BSTuner.MIDIBend(this, notes[0]))
             { Channel = (FourBitNumber)0, DeltaTime = firstDeltaTime });
+            // Add pitch bends to the other 3 notes in a similar manner, DeltaTime = 0
             for (int i = 1; i < notes.Length; i++)
             {
-                ushort midiBend = BSTuner.MIDIBend(masterBend, notes[i]);
+                ushort midiBend = BSTuner.MIDIBend(this, notes[i]);
                 events.Add(new PitchBendEvent(midiBend)
                 { Channel = (FourBitNumber)i });
             }
