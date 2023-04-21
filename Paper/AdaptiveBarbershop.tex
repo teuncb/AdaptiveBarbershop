@@ -29,16 +29,14 @@
 \begin{document}
 \maketitle
 
-% Thanks:
-% Jeroen en Peter
-% Jos en Tijs
-% Marc en Than
-% Jasper en Jay
-
-% TODO: Abstract
 \begin{abstract}
-	This thesis presents an adaptive just intonation algorithm for barbershop music. The first part of the research distils a mathematically ideal tuning system from the genre's conventions. The second part implements this algorithm in C$\sharp$ as a program that takes a tagged score as input and outputs a MIDI file with pitch bend messages. The proposed system provides just intonation at each moment in time and furthermore optimises three optional constraints, ordered based on parameters: having the lead voice mostly follow intervals from equal temperament, retuning held notes as little as possible and minimising tonal centre drift. Results suggest that, even though the parameters cannot all be completely optimised, the algorithm performs well on example songs. All code is publicly available on \texttt{\href{https://GitHub.com/teuncb/AdaptiveBarbershop}{GitHub}}.
+	When harmonies in music are tuned to follow just intonation intervals, it is impossible to always keep held notes at the same pitch while also maintaining a steady tonal centre. Adaptive tuning systems make specific choices to optimise those constraints, but none have been made to specifically work for barbershop music. The first part of this thesis distils an algorithm that optimises for the tuning conventions of barbershop. The second part implements this algorithm in C$\sharp$ as a program that takes a manually tagged barbershop score as input and outputs a MIDI file with pitch bend messages. The proposed system provides just intonation at each moment in time and furthermore optimises three parameterised constraints: close-to-equal-temperament intervals in the lead voice, minimal retuning of held notes and minimal tonal centre drift. Results show that the algorithm performs well on example songs and the provided parameters have a significant effect on the resulting tuning. All code is publicly available on \texttt{\href{https://GitHub.com/teuncb/AdaptiveBarbershop}{GitHub}}.
 \end{abstract}
+
+\section*{Acknowledgements}
+Thank you to Jeroen Fokker and Peter van Kranenburg for their guidance throughout the project; to Jos Mulkens for his continuous support and wise thoughts; to Tijs Krammer for setting me on the course of an adaptive tuning system; to Jasper de Gier and Jay Dougherty for their expertise from the barbershop world; and to Than van Nispen and Marc Groenewegen for their artistic input.
+
+\pagebreak
 
 \section{Introduction}
 \subsection{Adaptive Just Intonation for Barbershop}
@@ -106,16 +104,16 @@ However, there is no single algorithm that completely solves the mathematical pr
 
 To illustrate this incompatibility of the held notes constraint with the other constraint, consider the scenario in Figure \ref{fig:ties_vs_ji}. In this scenario, some notes are held over changing chords. The initial C-E third requires the E to be tuned 14 cents lower in order to create the just $5:4$ ratio. Because this E is held into the next chord, the other notes need to be tuned even lower. Eventually, these held notes cause the last C to be tuned 31 cents lower than the initial one. Also, because of the different functions of the last two Es, an audible pitch shift needs to be made between them. The overall tonal centre has moved 31 cents downwards, (\textit{flat}). This downward shift shows that held notes and tonal centre drift cannot both be optimised at the same time. As another example, the music in Figure \ref{fig:input} is an adapted version of a famously \say{rising} piece of music, developed by music theorist Benedetti (1530-1590). \cite{devaney_study_2012}
 
-Much research has been done into automatic \textit{adaptive tuning systems}: computer programs that take sets of musical notes as input, and return their respective tunings according to just intonation as output. \cite{sethares_adaptive_2005} Sethares \cite{sethares_adaptive_1994} approached the problem very generally by minimising a loss function based on a sound's dissonance curve. Løberg \cite{code_grovenmax_2002} implemented a dynamic tuning system by the Norwegian composer Eivind Groven that dynamically chooses between 36 available tones to get just intervals. Schwär et al \cite{schwar_differentiable_2021} developed a loss function for intonation in order to define it as a cost minimisation problem. Horner and Ayers \cite{horner_common_1996} developed a genetic algorithm for tuning that also optimises for held notes. Commercial software such as Hermode Tuning \cite{mohrlok_hermode_2003} and Pivotuner \cite{volkov_pivotuner_2022} can be integrated into music software to retune all played notes based on the sounding chord. Hermode sums the deviations in cents from equal temperament of all sounding notes and ensures that the result is mostly equal to 0. Conversely, Pivotuner picks a single note in each chord that should remain at the same pitch, enabling an artistic use of the resulting tonal centre drift.
-
-Most of the above-mentioned just intonation algorithms follow a general strategy for tuning, to apply to all genres. An algorithm that takes the limitations of barbershop quartets into account, such as the roles of the four different voices, is not known to have been made to the author.
-
 \begin{figure}
 	\centering
 	\includegraphics[width=\textwidth]{Figures/ties_vs_ji.pdf}
 	\caption{Incompatibility between the just intonation, tie and drift constraints. Each note shows its note name and deviation from equal temperament in cents. The just intonation fraction is also shown for some intervals. The held notes in combination with just intonation intervals require the overall tonal centre to shift downwards.}
 	\label{fig:ties_vs_ji}
 \end{figure}
+
+Much research has been done into automatic \textit{adaptive tuning systems}: computer programs that take sets of musical notes as input, and return their respective tunings according to just intonation as output. \cite{sethares_adaptive_2005} Sethares \cite{sethares_adaptive_1994} approached the problem very generally by minimising a loss function based on a sound's dissonance curve. Løberg \cite{code_grovenmax_2002} implemented a dynamic tuning system by the Norwegian composer Eivind Groven that dynamically chooses between 36 available tones to get just intervals. Schwär et al \cite{schwar_differentiable_2021} developed a loss function for intonation in order to define it as a cost minimisation problem. Horner and Ayers \cite{horner_common_1996} developed a genetic algorithm for tuning that also optimises for held notes. Commercial software such as Hermode Tuning \cite{mohrlok_hermode_2003} and Pivotuner \cite{volkov_pivotuner_2022} can be integrated into music software to retune all played notes based on the sounding chord. Hermode sums the deviations in cents from equal temperament of all sounding notes and ensures that the result is mostly equal to 0. Conversely, Pivotuner picks a single note in each chord that should remain at the same pitch, enabling an artistic use of the resulting tonal centre drift.
+
+Most of the above-mentioned just intonation algorithms follow a general strategy for tuning, to apply to all genres. An algorithm that takes the limitations of barbershop quartets into account, such as the roles of the four different voices, is not known to have been made to the author.
 
 
 \subsection{Barbershop Music}
@@ -137,10 +135,6 @@ However, very few barbershop quartets consistently achieve the high standard of 
 
 \section{Methodology}
 \label{methodoloy}
-% Nog eens een algemene omschrijving van wat het algoritme moet doen
-% input (language, including chords)
-  % fractions input
-% output: MIDI, but also analysis
 This thesis will propose an algorithm that adaptively tunes notes in barbershop scores to just intonation. Figure \ref{fig:pipeline} shows the pipeline that the implementation should follow. The tuning system will optimise the following criteria:
 \begin{enumerate}
 	\item maintain just intonation on every chord [\textit{just intonation constraint}]
@@ -150,10 +144,10 @@ This thesis will propose an algorithm that adaptively tunes notes in barbershop 
 \end{enumerate}
 
 \begin{figure}
-	\centering
-	\includegraphics[width=0.5\linewidth]{Figures/pipeline.pdf}
-	\caption{Pipeline for the implementation of the proposed adaptive just intonation algorithm for barbershop music. The program works on any four-part score, but requires a human tagger to translate it into a language that is specific to this algorithm. A parser can then interpret this language and build the internal data structure that the main algorithm uses to determine how each note should be tuned. At last, the library DryWetMidi is used to convert the tuned internal data structure to a MIDI file with pitch bend messages.}
-	\label{fig:pipeline}
+\centering
+\includegraphics[width=0.5\linewidth]{Figures/pipeline.pdf}
+\caption{Pipeline for the implementation of the proposed adaptive just intonation algorithm for barbershop music. The program works on any four-part score, but requires a human tagger to translate it into a language that is specific to this algorithm. A parser can then interpret this language and build the internal data structure that the main algorithm uses to determine how each note should be tuned. At last, the library DryWetMidi is used to convert the tuned internal data structure to a MIDI file with pitch bend messages.}
+\label{fig:pipeline}
 \end{figure}
 
 The input of the algorithm is basically the score of a barbershop song. Additionally, the music is tagged with information about the intended harmonies, as those can be relevant for tuning. The output is a tuning for every note that optimises the above four constraints.
@@ -167,7 +161,7 @@ The input of the algorithm is basically the score of a barbershop song. Addition
 
 For the C$\sharp$ implementation, the input already will already need to be split into a format that is friendly to the algorithm's internal representation. This representation will be different from existing digital representations of music \cite{midi_manufacturers_association_complete_2014, de_haas_music_2012, hsiao_compound_2021}, because it will already contain information that is specifically applied to this tuning algorithm. The input should therefore be written in \texttt{.txt}-files using a newly-defined language. This language is described in Appendix \ref{fig:input}. Importantly, the input splits the score into \texttt{Chord}s, which in this case are periods of time where none of the notes change. A new \texttt{Chord} begins any time one of the four voices stops singing, starts singing or moves to a different pitch. Figure \ref{fig:input} visualises such a split score. Because of this newly-defined language, a parser must be programmed to convert the input \texttt{.txt} files into the program's internal data structure. Conversion from the original sheet music to the input language is, for now, a human job.
 
-The output of the C$\sharp$ consists of a MIDI file \cite{midi_manufacturers_association_complete_2014} and some general statistics such as how much the song had to drift in general and which chords caused the most dramatic retunings. The MIDI files mostly contain the original notes from the score, now preceded by pitch bend messages. Section \ref{implementation} will describe the MIDI conversion in further detail.
+The output of the C$\sharp$ consists of a MIDI file \cite{midi_manufacturers_association_complete_2014} and some statistics, such as how much the song had to drift in general and which chords caused the most dramatic retunings. The MIDI files mostly contain the original notes from the score, now preceded by pitch bend messages. Section \ref{implementation} will describe the MIDI conversion in further detail.
 
 
 \section{Algorithm}
@@ -250,7 +244,7 @@ After the entire \texttt{Song} has been tuned, \texttt{Song.MIDISong} and \textt
 
 % Om te zien hoe dit algoritme het doet: stukje voorbeeldmuziek met verschillende parameters
 % We gebruiken dit nummer, is interessant voor deze redenen (bv. 2 lange tied noten, zoals vaak in tags)
-This section will show the proposed algorithm's effect on an example score, namely the tag of \textit{Ring-a-Ding Ding}, arranged by Anthony Bartholomew. Several good recordings of this song can be found on \href{https://www.youtube.com/watch?v=G40I5JDtfjI&t=147s}{YouTube}. Figure \ref{fig:ding_sheets} shows the sheet music for this tag. \cite{noauthor_barbershop_nodate} Since both the bass and tenor voices hold notes for a long time while the lead and baritone sing phrases in-between, \textit{Ring-a-Ding Ding} is a good example to show how the proposed algorithm makes choices in ambiguous scenarios. This thesis' \href{https://github.com/teuncb/adaptivebarbershop}{GitHub repository} also contains the algorithm's output MIDI files for \textit{Ring-a-Ding Ding}, as well as the results from other barbershop snippets, so it is possible to listen and compare.
+This section will show the proposed algorithm's effect on an example score, namely the tag of \textit{Ring-a-Ding Ding}, arranged by Anthony Bartholomew. Several good recordings of this song can be found on \texttt{\href{https://www.youtube.com/watch?v=G40I5JDtfjI&t=147s}{YouTube}}. Figure \ref{fig:ding_sheets} shows the sheet music for this tag. \cite{noauthor_barbershop_nodate} Since both the bass and tenor voices hold notes for a long time while the lead and baritone sing phrases in-between, \textit{Ring-a-Ding Ding} is a good example to show how the proposed algorithm makes choices in ambiguous scenarios. This thesis' \texttt{\href{https://github.com/teuncb/adaptivebarbershop}{GitHub repository}} also contains the algorithm's output MIDI files for \textit{Ring-a-Ding Ding}, as well as the results from other barbershop snippets, so it is possible to listen and compare.
 
 Figure \ref{fig:results} shows the effects that the three parameters (tieRange, leadRange and priority, see \ref{algorithm}) have on the lead, tie and drift constraints in \textit{Ring-a-Ding Ding}. Note that the just intonation constraint is, because of the permanent nature of the vertical step, always satisfied. The lead constraint is quantified as the number of lead intervals that had to deviate more than 10 cents from equal temperament intervals. The tie constraint is quantified as the number of pairs of held notes where the second note was more than 3 cents higher or lower than the first. The overall tonal centre drift with these parameters has also been plotted.
 
@@ -287,7 +281,7 @@ Research question A was: {\it what adaptive tuning algorithm would a mathematica
 % Antwoord vraag B: is het succesvol geïmplementeerd? Ja!
 Research question B was: {\it can we implement the tuning system from question A so that it models the ideal barbershop quartet?} The algorithm was successfully implemented in C$\sharp$, making the answer to question B a definitive yes. Of course, whether this implemented algorithm sounds like the perfect barbershop quartet is a matter of opinion. Nonetheless, since every chord is in just intonation and overall pitch drift can be kept to a minimum, it can be said that this algorithm poses a \textit{mathematically ideal} solution to the tuning problem that is implicitly posed by the Barbershop Harmony Society's Handbook. \cite{barbershop_harmony_society_contest_2022}
 
-The results from Figure \ref{fig:results} show that completely satisfying the four constraints posed in Section \ref{methodoloy} is, as predicted, not possible with the proposed algorithm. When $\mathit{tieRange}$ and $\mathit{leadRange}$ are close to 0, the tie constraint is satisfied, but we land on a different tonal centre than we started on, meaning the drift constraint is not satisfied. With looser ranges, the drift constraint can be satisfied, but there will always be some tied notes that need to be retuned, meaning the tie constraint has to be let go. Different barbershop songs may give different results. \textit{Ring-a-Ding Ding} is a relatively hard song to tune, meaning it might be possible to find a satisfactory tuning for some common barbershop songs. More examples of songs can be found in this thesis' \href{https://github.com/teuncb/adaptivebarbershop}{GitHub repository}.
+The results from Figure \ref{fig:results} show that completely satisfying the four constraints posed in Section \ref{methodoloy} is, as predicted, not possible with the proposed algorithm. When $\mathit{tieRange}$ and $\mathit{leadRange}$ are close to 0, the tie constraint is satisfied, but we land on a different tonal centre than we started on, meaning the drift constraint is not satisfied. With looser ranges, the drift constraint can be satisfied, but there will always be some tied notes that need to be retuned, meaning the tie constraint has to be let go. Different barbershop songs may give different results. \textit{Ring-a-Ding Ding} is a relatively hard song to tune, meaning it might be possible to find a satisfactory tuning for some common barbershop songs. More examples of songs can be found in this thesis' \texttt{\href{https://github.com/teuncb/adaptivebarbershop}{GitHub repository}}.
 
 % Interesting stuff in the results: dipje in LO rood, 
 A few interesting remarks can be made about the results from Figure \ref{fig:results}. Firstly, a very low $\mathit{tieRange}$ actually causes a very high number of retuned tied notes over 3 cents. That is because the algorithm prioritises tied notes in the order lead-bass-baritone-tenor; if the bass and tenor are both holding a note, then the tenor note might be completely ignored to ensure the bass note does not need to be retuned. Therefore, if the algorithm is very strict about the bass retuning, the tenor will only need to be retuned even more. Secondly, a steady $\mathit{tieRange}$ and a $\mathit{priority}$ set to lead appears to be a simple way to get a relatively low number of tied note retunings, because the lead interval can always be satisfied. Lastly, when the $\mathit{priority}$ is set to \say{tie}, there is a certain area of $\mathit{tieRange}$ and $\mathit{leadRange}$ values where not a single lead interval has to deviate from equal temperament, even though both lower and higher values for the Range parameters cause some deviations to occur. The exact reason for this dip is unclear, but it most likely also has to do with the effects of the algorithm's priorities.
@@ -336,7 +330,7 @@ These appendices describe the language in which \texttt{.txt} files should be wr
 % Notes: n, b and #; octaves; tied notes
 % Chords: with 4 notes, sometimes not playing; chord symbols
 % duration in MIDI, timecode at 480 (find unit), only used for MIDI
-The C$\sharp$ implementation of the proposed algorithm takes \texttt{.txt} files containing tagged scores as input. Converting a score to a \texttt{.txt} file involves splitting it into bits of time where no notes change called \texttt{Chord}s and interpreting the playing harmonies to add chord symbols. Figure \ref{fig:input} shows an example of the translation process. Some more examples of converted scores can be found in the \href{https://github.com/teuncb/AdaptiveBarbershop/tree/main/Songs}{Songs folder on the GitHub repository.}
+The C$\sharp$ implementation of the proposed algorithm takes \texttt{.txt} files containing tagged scores as input. Converting a score to a \texttt{.txt} file involves splitting it into bits of time where no notes change called \texttt{Chord}s and interpreting the playing harmonies to add chord symbols. Figure \ref{fig:input} shows an example of the translation process. Some more examples of converted scores can be found in the \texttt{\href{https://github.com/teuncb/AdaptiveBarbershop/tree/main/Songs}{Songs folder on the GitHub repository}}.
 
 A note consists of exactly four characters: a note name, an accidental, an octave, and a tie indication. If a voice is silent in a \texttt{Chord}, the note should simply be four spaces. The note name is simply a lower-case letter between a and g. The accidental is a character from the set $\{\texttt{\#}, \texttt{b}, \texttt{n}\}$, which stand for \say{sharp}, \say{flat} and \say{natural}, respectively. The octave is a number between 0 and 8, written as in Scientific Pitch Notation. \cite{pollens_pitch_2022} The octave makes no difference in the tuning process, but the note must be present on an 88-key piano. The tie indication is either \say{\texttt{t}} or a space, which indicates whether this note keeps playing in the next \texttt{Chord}. For example, \say{\texttt{an3 }} would be the highest A below middle C that stops after this \texttt{Chord}, whereas \say{\texttt{e\#4t}} would be the first E$\sharp$ (or, in this case equivalently, F) above middle C, that keeps playing after this \texttt{Chord}. In the last example, the next \texttt{Chord} should also contain this E$\sharp$ or F in the same voice.
 
@@ -348,7 +342,7 @@ A \texttt{Chord} is described using a single line containing a chord symbol, fou
 \label{input_fractions}
 % slashes
 % in code
-A \texttt{.txt} file describing interval ratios consist of exactly twelve lines, one for each of the twelve possible notes in the input. Each line consists of a frequency ratio with the root and additional comments after a \texttt{\%}. The first line corresponds to the chord root and is therefore logically \texttt{1/1}. The next lines each count up from the root in semitones. The eighth line therefore corresponds to a fifth, meaning it would most likely be \texttt{3/2} (see \ref{intro_ji}). The \href{https://github.com/teuncb/AdaptiveBarbershop/tree/main/TuningTables}{TuningTables folder on the GitHub repository} contains some examples of \texttt{Fraction} files.
+A \texttt{.txt} file describing interval ratios consist of exactly twelve lines, one for each of the twelve possible notes in the input. Each line consists of a frequency ratio with the root and additional comments after a \texttt{\%}. The first line corresponds to the chord root and is therefore logically \texttt{1/1}. The next lines each count up from the root in semitones. The eighth line therefore corresponds to a fifth, meaning it would most likely be \texttt{3/2} (see \ref{intro_ji}). The \texttt{\href{https://github.com/teuncb/AdaptiveBarbershop/tree/main/TuningTables}{TuningTables folder on the GitHub repository}} contains some examples of \texttt{Fraction} files.
 
 \end{appendices}
 
