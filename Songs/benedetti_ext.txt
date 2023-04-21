@@ -1,0 +1,6 @@
+GnM(    ,gn3t,dn4t,gn4 )480
+GnM(    ,gn3t,dn4t,an4t)240
+DnM(dn3t,gn3 ,dn4 ,an4t)240
+Dn7(dn3 ,cn4t,en4t,an4 )480
+CnM(en3 ,cn4 ,en4 ,gn4t)480
+GnM(    ,gn3 ,dn4 ,gn4 )480
