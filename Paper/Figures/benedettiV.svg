@@ -2,12 +2,12 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="319.77493mm"
-   height="288.258mm"
-   viewBox="0 0 319.77493 288.25799"
+   width="323.03412mm"
+   height="289.97745mm"
+   viewBox="0 0 323.03412 289.97744"
    version="1.1"
    id="svg5"
-   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
    sodipodi:docname="benedettiV.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -24,19 +24,21 @@
      inkscape:pagecheckerboard="1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="1.1819949"
-     inkscape:cx="389.5956"
-     inkscape:cy="478.42847"
+     inkscape:zoom="1.6715932"
+     inkscape:cx="737.91876"
+     inkscape:cy="991.26987"
      inkscape:window-width="1920"
-     inkscape:window-height="1001"
-     inkscape:window-x="-9"
-     inkscape:window-y="-9"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
-     fit-margin-bottom="0" />
+     fit-margin-bottom="0"
+     inkscape:showpageshadow="2"
+     inkscape:deskcolor="#d1d1d1" />
   <defs
      id="defs2">
     <marker
@@ -232,7 +234,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(23.514795,-13.4125)">
+     transform="translate(146.14043,-13.4125)">
     <rect
        style="fill:#808000;stroke-width:0.435905"
        id="rect1186"
@@ -1072,27 +1074,27 @@
          sodipodi:role="line"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New';stroke-width:0.317448"
          x="3.8835649"
-         y="255.49141"
+         y="255.47058"
          id="tspan28031">GnM(    ,gn3t,dn4t,an4t)240</tspan><tspan
          sodipodi:role="line"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New';stroke-width:0.317448"
          x="3.8835649"
-         y="266.37311"
+         y="266.33145"
          id="tspan28033">DnM(dn3t,gn3 ,dn4 ,an4t)240</tspan><tspan
          sodipodi:role="line"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New';stroke-width:0.317448"
          x="3.8835649"
-         y="277.25482"
+         y="277.19232"
          id="tspan28035">Dn7(dn3 ,cn4t,en4t,an4 )480</tspan><tspan
          sodipodi:role="line"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New';stroke-width:0.317448"
          x="3.8835649"
-         y="288.13651"
+         y="288.05316"
          id="tspan28037">CnM(en3 ,cn4 ,en4 ,gn4t)480</tspan><tspan
          sodipodi:role="line"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New';stroke-width:0.317448"
          x="3.8835649"
-         y="299.01822"
+         y="298.91403"
          id="tspan28039">GnM(    ,gn3 ,dn4 ,gn4 )480</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow2Lend)"
@@ -1104,73 +1106,73 @@
        d="m 65.529758,201.43734 v 31.0899"
        id="path29388" />
     <rect
-       style="fill:none;stroke:#000000;stroke-width:0.272704;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:none;stroke:#000000;stroke-width:0.280008;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0"
        id="rect29832"
-       width="140.14084"
-       height="63.156364"
-       x="2.1085894"
-       y="238.37778" />
+       width="140.13412"
+       height="66.58802"
+       x="2.1119473"
+       y="236.66193" />
     <text
        xml:space="preserve"
        style="font-size:8.81944px;line-height:1.25;font-family:'The Heritage Font';-inkscape-font-specification:'The Heritage Font';stroke-width:0.264583"
-       x="194.67293"
+       x="-146.1189"
        y="46.989212"
        id="text1934"><tspan
          sodipodi:role="line"
          id="tspan1932"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.81944px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
-         x="194.67293"
+         x="-146.1189"
          y="46.989212">a) Original score</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:8.81944px;line-height:1.25;font-family:'The Heritage Font';-inkscape-font-specification:'The Heritage Font';stroke-width:0.264583"
-       x="194.67293"
+       x="-146.1189"
        y="152.19624"
        id="text5764"><tspan
          sodipodi:role="line"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.81944px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
-         x="194.67293"
+         x="-146.1189"
          y="152.19624"
          id="tspan5908">b) Internal representation</tspan><tspan
          sodipodi:role="line"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.81944px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
-         x="194.67293"
-         y="163.6115"
+         x="-146.1189"
+         y="163.41676"
          id="tspan5912">with harmonic interpretation</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:8.81944px;line-height:1.25;font-family:'The Heritage Font';-inkscape-font-specification:'The Heritage Font';stroke-width:0.264583"
-       x="194.67293"
+       x="-146.1189"
        y="271.19919"
        id="text5998"><tspan
          sodipodi:role="line"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.81944px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
-         x="194.67293"
+         x="-146.1189"
          y="271.19919"
          id="tspan5996">c) Text file in input language</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:8.81944px;line-height:1.25;font-family:'The Heritage Font';-inkscape-font-specification:'The Heritage Font';stroke-width:0.264583"
-       x="77.785767"
+       x="-7.4864969"
        y="92.237"
        id="text8712"><tspan
          sodipodi:role="line"
          id="tspan8710"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.81944px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
-         x="77.785767"
+         x="-7.4864969"
          y="92.237">Split into <tspan
    style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New'"
    id="tspan12050">Chord</tspan>s</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:8.81944px;line-height:1.25;font-family:'The Heritage Font';-inkscape-font-specification:'The Heritage Font';stroke-width:0.264583"
-       x="77.785767"
+       x="-7.4864969"
        y="221.71178"
        id="text13910"><tspan
          sodipodi:role="line"
          id="tspan13908"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:8.81944px;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, ';stroke-width:0.264583"
-         x="77.785767"
+         x="-7.4864969"
          y="221.71178">Translate to <tspan
    style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Courier New';-inkscape-font-specification:'Courier New'"
    id="tspan14912">.txt</tspan></tspan></text>

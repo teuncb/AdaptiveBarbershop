@@ -2,9 +2,9 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="200.09302mm"
+   width="200.2243mm"
    height="58.941669mm"
-   viewBox="0 0 200.09302 58.941669"
+   viewBox="0 0 200.22431 58.941669"
    version="1.1"
    id="svg314"
    inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
@@ -25,9 +25,9 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="1.4142136"
-     inkscape:cx="383.60543"
-     inkscape:cy="57.275649"
+     inkscape:zoom="16"
+     inkscape:cx="755.59373"
+     inkscape:cy="30.937499"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
      inkscape:window-x="-8"
@@ -52,7 +52,7 @@
        inkscape:collect="always"
        id="linearGradient6524">
       <stop
-         style="stop-color:#000090;stop-opacity:1;"
+         style="stop-color:#00007a;stop-opacity:1;"
          offset="0"
          id="stop6520" />
       <stop
@@ -575,7 +575,7 @@
          id="tspan6127"
          style="font-size:6.11047px;fill:#ffffff;stroke-width:0.254602"
          x="153.77654"
-         y="39.029087">E -55c</tspan></text>
+         y="39.029087">E -45c</tspan></text>
     <rect
        style="fill:url(#linearGradient6682);fill-opacity:1;fill-rule:evenodd;stroke-width:0.409202"
        id="rect6676"
@@ -672,24 +672,34 @@
          x="168.54475"
          y="63.354271">root</tspan></text>
     <path
-       style="fill:#800000;stroke:#800000;stroke-width:0.324301;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.324301,0.64860201;stroke-dashoffset:0;stroke-opacity:1"
+       style="fill:#800000;stroke:#800000;stroke-width:0.324301;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.324301, 0.648602;stroke-dashoffset:0;stroke-opacity:1"
        d="M 40.071982,2.1166666 V 61.058276"
        id="path33248"
        sodipodi:nodetypes="cc" />
     <path
-       style="fill:#800000;stroke:#800000;stroke-width:0.324301;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.324301,0.64860201;stroke-dashoffset:0;stroke-opacity:1"
+       style="fill:#800000;stroke:#800000;stroke-width:0.324301;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.324301, 0.648602;stroke-dashoffset:0;stroke-opacity:1"
        d="M 80.069133,2.1166666 V 61.058276"
        id="path7449"
        sodipodi:nodetypes="cc" />
     <path
-       style="fill:#800000;stroke:#800000;stroke-width:0.324301;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.324301,0.64860201;stroke-dashoffset:0;stroke-opacity:1"
+       style="fill:#800000;stroke:#800000;stroke-width:0.324301;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.324301, 0.648602;stroke-dashoffset:0;stroke-opacity:1"
        d="M 120.06913,2.1166666 V 61.058276"
        id="path7451"
        sodipodi:nodetypes="cc" />
     <path
-       style="fill:#800000;stroke:#800000;stroke-width:0.324301;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.324301,0.64860201;stroke-dashoffset:0;stroke-opacity:1"
+       style="fill:#800000;stroke:#800000;stroke-width:0.324301;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.324301, 0.648602;stroke-dashoffset:0;stroke-opacity:1"
        d="M 160.06913,2.1166666 V 61.058276"
        id="path7453"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:#800000;stroke:#800000;stroke-width:0.324301;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.324301, 0.648602;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 0.06913286,2.1166666 V 61.058276"
+       id="path409"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:#800000;stroke:#800000;stroke-width:0.324301;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:0.324301, 0.648602;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 199.96913,2.1166666 V 61.058276"
+       id="path411"
        sodipodi:nodetypes="cc" />
   </g>
 </svg>

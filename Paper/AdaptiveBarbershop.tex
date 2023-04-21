@@ -15,6 +15,8 @@
 
 \renewcommand{\figurename}{\bf Figure}
 
+\usepackage{geometry} % Change page margins on the fly
+
 % Manual indents in pseudocode
 \newlength\myindent
 \setlength\myindent{2em}
@@ -27,16 +29,36 @@
 \author{{\bf Teun Buwalda}\\t.c.buwalda@students.uu.nl\\6787886, Utrecht University\\Bachelor's thesis}
 
 \begin{document}
-\maketitle
+
+\newgeometry{top=90pt} % Temporarily decrease top margin for cover art
+
+\begin{titlepage}
+
+\begin{center}
+	\includegraphics[height=0.3\textheight]{Figures/poles_logo.pdf}
+\end{center}
+
+\vspace{-15pt}
+
+{
+	\let\newpage\relax
+	\maketitle
+}
 
 \begin{abstract}
 	When harmonies in music are tuned to follow just intonation intervals, it is impossible to always keep held notes at the same pitch while also maintaining a steady tonal centre. Adaptive tuning systems make specific choices to optimise those constraints, but none have been made to specifically work for barbershop music. The first part of this thesis distils an algorithm that optimises for the tuning conventions of barbershop. The second part implements this algorithm in C$\sharp$ as a program that takes a manually tagged barbershop score as input and outputs a MIDI file with pitch bend messages. The proposed system provides just intonation at each moment in time and furthermore optimises three parameterised constraints: close-to-equal-temperament intervals in the lead voice, minimal retuning of held notes and minimal tonal centre drift. Results show that the algorithm performs well on example songs and the provided parameters have a significant effect on the resulting tuning. All code is publicly available on \texttt{\href{https://GitHub.com/teuncb/AdaptiveBarbershop}{GitHub}}.
 \end{abstract}
 
-\section*{Acknowledgements}
-Thank you to Jeroen Fokker and Peter van Kranenburg for their guidance throughout the project; to Jos Mulkens for his continuous support and wise thoughts; to Tijs Krammer for setting me on the course of an adaptive tuning system; to Jasper de Gier and Jay Dougherty for their expertise from the barbershop world; and to Than van Nispen and Marc Groenewegen for their artistic input.
+\begin{quotation}
+	\begin{center}
+		\textbf{\textit{Acknowledgements}}
+	\end{center}
+	{\small \it Thank you to Jeroen Fokker and Peter van Kranenburg for their guidance throughout the project; to Jos Mulkens for his continuous support and wise thoughts; to Tijs Krammer for setting me on the course of an adaptive tuning system; to Jasper de Gier and Jay Dougherty for their expertise from the barbershop world; to Than van Nispen and Marc Groenewegen for their artistic input; to Titus Mars and Jeanne Buwalda for their critical view.}
+\end{quotation}
 
-\pagebreak
+\end{titlepage}
+
+\newgeometry{} % Reset margins for second page onward
 
 \section{Introduction}
 \subsection{Adaptive Just Intonation for Barbershop}
@@ -53,7 +75,6 @@ Research question B is: {\it can we implement the tuning system from question A 
 To provide the necessary context to answer both of these questions, the following section will expand upon the subjects of just intonation, adaptive just intonation algorithms and barbershop music. The following section will describe the exact methodology and further describe the algorithm's constraints. Sections \ref{algorithm} and \ref{implementation} will answer research questions A and B, respectively. Section \ref{results} will evaluate the algorithm by analysing results such as global pitch drift and particularly hard-to-tune passages. Section \ref{discussion} will then place this research in the context of other literature about choirs, tuning and philosophy.
 
 \subsection{Relevance to KI}
-% TODO: ik heb een taal bedacht! woe! het appendix-ding
 This thesis project is part of the bachelor Kunstmatige Intelligentie at Utrecht University. The Utrecht University AI programmes focus on Human-Centered Artificial Intelligence (HCAI), rather than trying to keep up with the latest innovations in machine learning algorithms. HCAI targets to understand, reproduce and if possible enhance human intelligence. \cite{utrecht_university_human-centered_2023} Modelling something specifically human such as music is inherently AI research, especially when trying to build an algorithm that is inspired by human performance, but performs better. Therefore, finding a tuning algorithm for barbershop music fits right into the HCAI focus area.
 
 This study involves the definition of a new language to describe written music, was written as a computer science project and analysed afterwards from a philosophical perspective. All three of those sciences are important areas of HCAI.
@@ -145,7 +166,7 @@ This thesis will propose an algorithm that adaptively tunes notes in barbershop 
 
 \begin{figure}
 \centering
-\includegraphics[width=0.5\linewidth]{Figures/pipeline.pdf}
+\includegraphics[height=0.8\textheight]{Figures/pipeline.pdf}
 \caption{Pipeline for the implementation of the proposed adaptive just intonation algorithm for barbershop music. The program works on any four-part score, but requires a human tagger to translate it into a language that is specific to this algorithm. A parser can then interpret this language and build the internal data structure that the main algorithm uses to determine how each note should be tuned. At last, the library DryWetMidi is used to convert the tuned internal data structure to a MIDI file with pitch bend messages.}
 \label{fig:pipeline}
 \end{figure}
@@ -180,12 +201,18 @@ This section will describe the tuning algorithm proposed by this thesis, thereby
 
 The algorithm distinguishes between two levels of tuning: \textit{individual bend} and \textit{master bend}. The individual bend describes how much the notes within a chord differ from each other relatively and is determined in the vertical step of the algorithm. A note's individual bend is only relative to the tuning of the other three notes in the chord, where a chord only spans a period of time where not a single note changes. The master bend, on the other hand, is used to move an entire chord's tuning up or down and is determined in the horizontal step. A note's pitch is ultimately calculated by adding its individual bend to the chord's master bend (\textit{posterior bend}) and using the result as a degree of deviation from equal temperament. Importantly, a note's individual bend never changes after the vertical step of the algorithm is done, making sure the notes of one chord always stay justly tuned with one another. Therefore, constraint 1 is always satisfied.
 
-The vertical step (Figure \ref{fig:algo_outline}b) determines each note's individual bend using just intonation intervals. The bend value for the chord root is always set to 0 (again, since these are relative values, that does not actually mean the root will be tuned to the regular 12-tone equal temperament value). The bend values for the other playing notes are decided using a set of interval values based on fractions relative to the chord root. This set of fractions can be given by the user, but a standard set is provided. The fractions are taken from simple ratios in the harmonic series. For example, the dominant seventh chord is usually described with a $4:5:6:7$ ratio between its chord tones. Therefore, in an A dominant seventh chord (A-C$\sharp$-E-G), the G's frequency will be tuned to be $\frac74$ times the A's frequency. On the other hand, a half-diminished chord is usually described with a $5:6:7:9$ ratio, so in an A half-diminished chord (A-C-E$\flat$-G), the G will be equal to $\frac95$ times the A. Differences like this one are why the chords need to be tagged with their intended harmony.
+The vertical step (Figure \ref{fig:algo_outline}b) determines each note's individual bend using just intonation intervals. The bend value for the chord root is always set to 0 (again, since these are relative values, that does not actually mean the root will be tuned to the regular 12-tone equal temperament value). The bend values for the other playing notes are decided using a set of interval values based on fractions relative to the chord root (Figure \ref{fig:fractions}). This set of fractions can be given by the user, but a standard set is provided. The fractions are taken from simple ratios in the harmonic series. For example, the dominant seventh chord is usually described with a $4:5:6:7$ ratio between its chord tones. Therefore, in an A dominant seventh chord (A-C$\sharp$-E-G), the G's frequency will be tuned to be $\frac74$ times the A's frequency. On the other hand, a half-diminished chord is usually described with a $5:6:7:9$ ratio, so in an A half-diminished chord (A-C-E$\flat$-G), the G will be equal to $\frac95$ times the A. Differences like this one are why the chords need to be tagged with their intended harmony.
 
 The horizontal step (Figure \ref{fig:algo_outline}c) moves all chord notes around evenly to satisfy constraints 2-4 (lead, tie and drift; see Section \ref{methodoloy}). Specifically, it outputs a master bend value for the current chord by comparing it to the previous chord. For the lead and tie constraints, a collection of lead notes and tied notes from the previous chord is made in order to calculate how much the current master bend can move around while satisfying those constraints. Each of those notes has a desired space that the new note should move into. To illustrate: in the figure, $\mathit{tieRange}$ is set to 3 and the previous G4 is tied over, so the current G4 should be within 3 cents of the old G4. Meanwhile, $\mathit{leadRange}$ is set to 10 and the previous F4 has a posterior bend of 0 cents, so the current E4 should deviate less than 10 cents from equal temperament. After the collection of lead and tied notes has been completely run through, the algorithm chooses a value for the master bend that is as close to 0 as possible. This last step helps the drift constraint, because a master bend value of 0 means that there is no tonal centre drift.
 
-% TODO: Fractions als figuur
-Ultimately, the algorithm's results depend on a set of parameters given by the user. The first parameter is a set of lists of fractions that should be used for the vertical step. This first parameter is important to note, because opinions vary as to which exact tunings are the best for each interval. The other three parameters are referred to as $\mathit{priority}$, $\mathit{tieRange}$ and $\mathit{leadRange}$. $\mathit{priority}$ is either \say{lead} or \say{tie} and determines whether the lead or tie constraint should be satisfied first. $\mathit{tieRange}$, given in a unit similar to cents, determines how much a tied note is allowed to be retuned compared to its predecessor. $\mathit{leadRange}$ is similar: it determines by how many cents an interval in the lead voice is allowed to deviate from a relative interval in equal temperament (i.e. from a multiple of 100 cents). For instance, if $\mathit{tieRange}$ is set to 3 and $\mathit{priority}$ is set to \say{tie}, the horizontal step of the algorithm will prioritise moving the most important tied note less than 3 cents up or down over the other tied notes, the lead constraint and the drift constraint.
+Ultimately, the algorithm's results depend on a set of parameters given by the user. The first parameter is a set of lists of fractions that should be used for the vertical step (Figure \ref{fig:fractions}). This first parameter is important to note, because opinions vary as to which exact tunings are the best for each interval. The other three parameters are referred to as $\mathit{priority}$, $\mathit{tieRange}$ and $\mathit{leadRange}$. $\mathit{priority}$ is either \say{lead} or \say{tie} and determines whether the lead or tie constraint should be satisfied first. $\mathit{tieRange}$, given in a unit similar to cents, determines how much a tied note is allowed to be retuned compared to its predecessor. $\mathit{leadRange}$ is similar: it determines by how many cents an interval in the lead voice is allowed to deviate from a relative interval in equal temperament (i.e. from a multiple of 100 cents). For instance, if $\mathit{tieRange}$ is set to 3 and $\mathit{priority}$ is set to \say{tie}, the horizontal step of the algorithm will prioritise moving the most important tied note less than 3 cents up or down over the other tied notes, the lead constraint and the drift constraint.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{Figures/fractions.pdf}
+	\caption{Different interval ratios for different chord symbols with the same root. The fractions are intervals in just intonation relative to the root note, the E. The intervals for major/dominant chords are chosen such that a dominant seventh chord follows the preferred ratio of $4:5:6:7$. \cite{van_de_craats_fis_1989} The fractions for the minor/half-diminished chords, on the other hand, are chosen such that a half-diminished chord follows $5:6:7:9$ and a minor seventh chord follows $10:12:15:18$. \cite{van_de_craats_fis_1989} These fractions are the default ones used by the vertical step of the algorithm, but can be changed using the language described in Appendix \ref{input_fractions}.}
+	\label{fig:fractions}
+\end{figure}
 
 \section{C$\sharp$ Implementation}
 \label{implementation}
@@ -244,7 +271,7 @@ After the entire \texttt{Song} has been tuned, \texttt{Song.MIDISong} and \textt
 
 % Om te zien hoe dit algoritme het doet: stukje voorbeeldmuziek met verschillende parameters
 % We gebruiken dit nummer, is interessant voor deze redenen (bv. 2 lange tied noten, zoals vaak in tags)
-This section will show the proposed algorithm's effect on an example score, namely the tag of \textit{Ring-a-Ding Ding}, arranged by Anthony Bartholomew. Several good recordings of this song can be found on \texttt{\href{https://www.youtube.com/watch?v=G40I5JDtfjI&t=147s}{YouTube}}. Figure \ref{fig:ding_sheets} shows the sheet music for this tag. \cite{noauthor_barbershop_nodate} Since both the bass and tenor voices hold notes for a long time while the lead and baritone sing phrases in-between, \textit{Ring-a-Ding Ding} is a good example to show how the proposed algorithm makes choices in ambiguous scenarios. This thesis' \texttt{\href{https://github.com/teuncb/adaptivebarbershop}{GitHub repository}} also contains the algorithm's output MIDI files for \textit{Ring-a-Ding Ding}, as well as the results from other barbershop snippets, so it is possible to listen and compare.
+This section will show the proposed algorithm's effect on an example score, namely the tag of \textit{Ring-a-Ding Ding}, arranged by Anthony Bartholomew. Several good recordings of this song can be found on \texttt{\href{https://www.youtube.com/watch?v=G40I5JDtfjI&t=147s}{YouTube}}. Figure \ref{fig:ding_sheets} shows the sheet music for this tag. \cite{dominikschaller_barbershop_2015} Since both the bass and tenor voices hold notes for a long time while the lead and baritone sing phrases in-between, \textit{Ring-a-Ding Ding} is a good example to show how the proposed algorithm makes choices in ambiguous scenarios. This thesis' \texttt{\href{https://github.com/teuncb/adaptivebarbershop}{GitHub repository}} also contains the algorithm's output MIDI files for \textit{Ring-a-Ding Ding}, as well as the results from other barbershop snippets, so it is possible to listen and compare.
 
 Figure \ref{fig:results} shows the effects that the three parameters (tieRange, leadRange and priority, see \ref{algorithm}) have on the lead, tie and drift constraints in \textit{Ring-a-Ding Ding}. Note that the just intonation constraint is, because of the permanent nature of the vertical step, always satisfied. The lead constraint is quantified as the number of lead intervals that had to deviate more than 10 cents from equal temperament intervals. The tie constraint is quantified as the number of pairs of held notes where the second note was more than 3 cents higher or lower than the first. The overall tonal centre drift with these parameters has also been plotted.
 
@@ -254,7 +281,7 @@ The plots show that tonal centre drift is negatively correlated with both $\math
 \begin{figure}
 	\centering
 	\includegraphics[width=\linewidth]{Figures/Ding_MuseScore.pdf}
-	\caption{Sheet music for the tag of \textit{Ring-a-Ding Ding}, a barbershop arrangement by Anthony Bartholomew.}
+	\caption{Sheet music for the tag of \textit{Ring-a-Ding Ding}, a barbershop arrangement by Anthony Bartholomew. This tag was used as an example song in the Results section.}
 	\label{fig:ding_sheets}
 \end{figure}
 
@@ -298,7 +325,7 @@ Even the concept of just intonation itself is a subject of debate: are the inter
 
 At the same time, it is important to note that twelve-tone bias does play a role in this article's proposed tuning system. Barbershop music is composed with the western standard division of the octave in mind, which means notes that sound the same on the piano are often meant to sound the same in singing as well. A tuning method that does not adhere to the twelve-tone system and is, therefore, more culturally independent, was proposed by Sethares. \cite{sethares_adaptive_1994} Instead of using fractions from the harmonic series, he proposes to analyse a note's timbre using its \textit{dissonance curve}. However, since the present article focuses specifically on barbershop, dissonance curves will always adhere to the natural harmonic series and using the twelve-tone system is commonplace. For these reasons, it was decided not to use Sethares' proposal in the current research.
 
-\subsection{Philosophical Framework} % TODO
+\subsection{Philosophical Framework}
 % strong vs weak AI: wat het is, wat dit is en waarom, wat als dit het niet zou zijn
 % ethics: ethical concerns of computers making music: future of work (calo), maintain the legal status of tools (fjeld), achievement gap (danaher). 
 Philosophy regarding artificial intelligence recognises two classifications of views about the future of the technology: \textit{weak AI} and \textit{strong AI}. Weak AI supposes that AI can merely exist as tools to make human lives easier, whereas strong AI also allows it to learn and understand as humans do and have other cognitive states. \cite{searle_minds_1980} Since music-making is a creative process, crossing the border of outperforming humans in music might be seen as strong AI. \cite{gottschall_rise_2015} However, when a computer is only following a set of rules without being able to add emotion, it might lack the ability to create beauty. \cite{braga_emperor_2017} The fact that the proposed algorithm in this thesis only follows rules to enrich man-made music explicitly places it in the classification of weak AI.
@@ -317,10 +344,10 @@ The scope of this thesis did not allow for a comparison to real-world barbershop
 \subsection{Code Availability}
 All code for the C$\sharp$ implementation of the algorithm, along with example songs, source files for the images and \TeX-files for this thesis can be found on \texttt{\url{https://GitHub.com/teuncb/AdaptiveBarbershop}}.
 
-% TODO referenties naar webpagina's fixen
 % \bibliography{AdaptiveBarbershop.bib}
 % \bibliographystyle{ieeetr}
 \printbibliography
+The cover art and figures including piano keyboards were designed using assets from Freepik.com.
 
 \begin{appendices}
 These appendices describe the language in which \texttt{.txt} files should be written for the presented C$\sharp$ program to interpret music. Appendix \ref{input_songs} describes how a Barbershop score can be converted into a \texttt{.txt} file. Appendix \ref{input_fractions} then describes how a user can prescribe just intonation frequency ratios based on a playing chord.
