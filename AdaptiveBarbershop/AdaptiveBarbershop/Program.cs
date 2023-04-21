@@ -8,6 +8,17 @@ namespace AdaptiveBarbershop
     {
         static void Main(string[] args)
         {
+            //// BASIC USAGE
+            //BSTuner tuner = new BSTuner(tieRadius: 0, leadRadius: 0, prio: 't');
+            //string songTitle = "benedetti_ext";
+            //Song song = new Song(songTitle);
+            //song.WriteMidiFile(songTitle + "_untuned");
+
+            //tuner.TuneSong(song, analyze:true);
+            //song.WriteMidiFile(songTitle + "_tunedStrict");
+            //Console.WriteLine("done");
+            //Console.ReadLine();
+
             // FULL ALGORITHM RESULTS CODE
             // This is the code I used to set up the plot for Ring-a-Ding Ding
 

@@ -1,12 +1,12 @@
-1/1		# (5/4) / (5/4). These intervals were drawn from the overtone series with the root a 16vb third lower, so all ratios are divided by 5/4.
-16/15	# (4/3) / (5/4) (fourth) - is this 7-limit?
-28/25	# (7/5) / (5/4) (tritone)
-6/5		# (3/2) / (5/4) (fifth)
-32/25	# (8/5) / (5/4) (minor sixth)
-4/3		# (5/3) / (5/4) (major sixth)
-7/5		# (7/4) / (5/4) (minor seventh)
-3/2		# (15/8) / (5/4) (major seventh)
-8/5		# (2/1) / (5/4) (octave)
-17/10	# (2/1 * 17/16) / (5/4) (octave + minor second) - note that this isn't actually 7-limit
-9/5		# (2/1 * 9/8) / (5/4) (octave + major second)
-48/25	# (2/1 * 6/5) / (5/4) (octave + minor third)
+1/1		% (5/4) / (5/4). These intervals were drawn from the overtone series with the root a 16vb third lower than the chord root, so all ratios are divided by 5/4.
+16/15	% (4/3) / (5/4) (fourth)
+28/25	% (7/5) / (5/4) (tritone)
+6/5		% (3/2) / (5/4) (fifth)
+32/25	% (8/5) / (5/4) (minor sixth)
+4/3		% (5/3) / (5/4) (major sixth)
+7/5		% (7/4) / (5/4) (minor seventh)
+3/2		% (15/8) / (5/4) (major seventh)
+8/5		% (2/1) / (5/4) (octave)
+5/3		% pulling this from the other overtone series couldn't be 7-limit
+9/5		% (2/1 * 9/8) / (5/4) (octave + major second)
+48/25	% (2/1 * 6/5) / (5/4) (octave + minor third)

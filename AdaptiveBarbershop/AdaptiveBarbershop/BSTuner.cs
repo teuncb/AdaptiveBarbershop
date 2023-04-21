@@ -34,11 +34,11 @@ namespace AdaptiveBarbershop
         /// <param name="pathDim7">Path to a file with just intonation fractions to use for diminished (o) chords.</param>
         /// <param name="pathHalfDim">Path to a file with just intonation fractions to use for half-diminished (0) chords.</param>
         public BSTuner(double tieRadius = 0.03, double leadRadius = 0.20, char prio = 't',
-            string pathMaj     = "../../../../../TuningTables/maj_lim17.txt",
-            string pathMin     = "../../../../../TuningTables/min_lim7.txt",
-            string pathDom     = "../../../../../TuningTables/maj_lim17.txt",
-            string pathDim7    = "../../../../../TuningTables/dim7_lim17.txt",
-            string pathHalfDim = "../../../../../TuningTables/min_lim7.txt")
+            string pathMaj     = "TuningTables/maj_lim17.txt",
+            string pathMin     = "TuningTables/min_lim7.txt",
+            string pathDom     = "TuningTables/maj_lim17.txt",
+            string pathDim7    = "TuningTables/dim7_lim17.txt",
+            string pathHalfDim = "TuningTables/min_lim7.txt")
         {
             if (!prioTypes.Contains(prio))
                 throw new ArgumentException(prio.ToString() + " is not a valid priority type, should be either l or t");
@@ -48,16 +48,21 @@ namespace AdaptiveBarbershop
             tieRange = new Range(-tieRadius, tieRadius);
             leadRange = new Range(-leadRadius, leadRadius);
 
+            string rootPath = "../../../../../";
             tuningTables = new Dictionary<char, Fraction[]>(5);
-            tuningTables.Add('M', TuningTable(pathMaj));
-            tuningTables.Add('m', TuningTable(pathMin));
-            tuningTables.Add('7', TuningTable(pathDom));
-            tuningTables.Add('o', TuningTable(pathDim7));
-            tuningTables.Add('0', TuningTable(pathHalfDim));
+            tuningTables.Add('M', TuningTable(rootPath + pathMaj));
+            tuningTables.Add('m', TuningTable(rootPath + pathMin));
+            tuningTables.Add('7', TuningTable(rootPath + pathDom));
+            tuningTables.Add('o', TuningTable(rootPath + pathDim7));
+            tuningTables.Add('0', TuningTable(rootPath + pathHalfDim));
         }
 
-        /// Initialise a table of interval fractions from a file
-        /// These are the fractions that will be used for just intonation intervals in the vertical step
+        /// <summary>
+        /// Initialise a table of interval fractions from a file. These are the frequency ratios 
+        /// that will be used for just intonation intervals in the vertical step.
+        /// </summary>
+        /// <param name="tablePath"></param>
+        /// <returns></returns>
         public Fraction[] TuningTable(string tablePath)
         {
             // Require exactly 12 fractions
@@ -502,16 +507,16 @@ namespace AdaptiveBarbershop
         /// Checks whether two ranges overlap and return the overlapping part
         public static Range GetOverlap(Range r1, Range r2)
         {
-            if (r1.lower > r1.upper || r2.lower > r2.upper)
+            if (r1.lower > r1.upper + 0.0000001 || r2.lower > r2.upper + 0.0000001)
                 throw new ArgumentException("Invalid range in overlap method");
 
             Range ol = r1;
 
             if (Distance(r1, r2) == 0)
             {
-                if (r2.lower > ol.lower)
+                if (r2.lower > ol.lower - 0.0000001)
                     ol.lower = r2.lower;
-                if (r2.upper < ol.upper)
+                if (r2.upper < ol.upper + 0.0000001)
                     ol.upper = r2.upper;
                 return ol;
             }
@@ -554,8 +559,8 @@ namespace AdaptiveBarbershop
         }
         public Fraction(string input)
         {
-            // Comments can be added after a hashtag
-            string noComments = input.Split('#')[0];
+            // Comments can be added after a percent sign
+            string noComments = input.Split('%')[0];
 
             string[] portions = noComments.Split('/');
 
