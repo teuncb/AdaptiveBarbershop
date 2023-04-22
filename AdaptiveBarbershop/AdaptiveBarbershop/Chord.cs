@@ -17,10 +17,12 @@ namespace AdaptiveBarbershop
         private static HashSet<char> chordTypes = new HashSet<char>() { 'M', 'm', '7', 'o', '0' };
         private static char[] delimiters = { '(', ')', ',' };
 
-        public Chord(string input, int start, bool print = false)
+        /// <summary>
         /// Initializes a Chord from an input string as described in Appendix A of the paper.
+        /// </summary>
         /// <param name="input">sets the absolute startTime.</param>
         /// <param name="print">whether to print update messages inbetween.</param>
+        public Chord(string input, int start, bool print = false)
         {
             // Comments can be added after a percent sign
             string noComments = input.Split('%')[0];
@@ -56,6 +58,7 @@ namespace AdaptiveBarbershop
             duration = int.Parse(portions[5]);
             masterBend = 0;
         }
+
         /// <summary>
         /// Returns the sum of this chord's masterBend and the indivBend of note i.
         /// </summary>
@@ -65,6 +68,7 @@ namespace AdaptiveBarbershop
         {
             return masterBend + notes[i].indivBend;
         }
+
         /// <summary>
         /// Returns the sum of this chord's masterBend and the indivBend of the given note.
         /// </summary>

@@ -5,7 +5,7 @@ namespace AdaptiveBarbershop
 {
     class Note
     {
-        public bool playing;    // Is any note playing in thie chord?
+        public bool playing;    // Is any note playing in this chord?
         public int noteNum;     // Usually between 0 and 11: 0 = c, 1 = c#, etc.
         public string noteName; // The actual note name
         public int octave;      // This note's octave as in scientific pitch notation (where middle C is C4)
@@ -13,7 +13,7 @@ namespace AdaptiveBarbershop
         public double indivBend;// Deviation from temperament in semitones
         public int midiNoteID;  // Number of this note as it would be in a MIDI file
 
-        // Translates note names within the octave to their noteNums
+        /// <summary>Translates note names within the octave to their noteNums.</summary>
         public static Dictionary<string, int> noteNames = new Dictionary<string, int>
         {
             { "cb",-1 }, { "cn", 0 }, { "c#", 1 },

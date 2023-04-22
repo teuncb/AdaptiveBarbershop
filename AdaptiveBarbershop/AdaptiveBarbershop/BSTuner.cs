@@ -9,8 +9,9 @@ namespace AdaptiveBarbershop
     class BSTuner
     {
         // The 4 voices in order of importance. When optimising tied notes, the lead should be
-        // handled first, then the bass, then the tenor and lastly the baritone.
-        private static int[] voicesOrder = new int[4] { 2, 0, 3, 1 };
+        // handled first by default, then the bass, then the tenor and lastly the baritone.
+        private int[] voicesOrder;
+        private static int[] defaultVoicesOrder = new int[4] { 2, 0, 3, 1 };
         private static string[] voiceNames = new string[4] { "bass", "baritone", "lead", "tenor" };
         // Either l for lead or t for tied notes: which one should be optimised first?
         private char priority;
@@ -28,12 +29,13 @@ namespace AdaptiveBarbershop
         /// <param name="tieRadius">How much tied notes are allowed to retune, in semitones.</param>
         /// <param name="leadRadius">How much lead intervals are allowed to deviate from ET intervals, in semitones.</param>
         /// <param name="prio">Either 'l' for lead or 't' for tie: which constraint should be satisfied first?</param>
+        /// <param name="orderOfVoices">An array of length 4 containing the order of importance for the voices when retuning tied notes. Default is 2, 0, 3, 1 (lead, bass, tenor, baritone).</param>
         /// <param name="pathMaj">Path to a file with just intonation fractions to use for major (M) chords.</param>
         /// <param name="pathMin">Path to a file with just intonation fractions to use for minor (m) chords.</param>
         /// <param name="pathDom">Path to a file with just intonation fractions to use for dominant (7) chords.</param>
         /// <param name="pathDim7">Path to a file with just intonation fractions to use for diminished (o) chords.</param>
         /// <param name="pathHalfDim">Path to a file with just intonation fractions to use for half-diminished (0) chords.</param>
-        public BSTuner(double tieRadius = 0.03, double leadRadius = 0.20, char prio = 't',
+        public BSTuner(double tieRadius = 0.03, double leadRadius = 0.20, char prio = 't', int[] orderOfVoices = null,
             string pathMaj     = "TuningTables/maj_lim17.txt",
             string pathMin     = "TuningTables/min_lim7.txt",
             string pathDom     = "TuningTables/maj_lim17.txt",
@@ -47,6 +49,20 @@ namespace AdaptiveBarbershop
 
             tieRange = new Range(-tieRadius, tieRadius);
             leadRange = new Range(-leadRadius, leadRadius);
+
+            voicesOrder = orderOfVoices ?? defaultVoicesOrder;
+            // Check validity of voicesOrder
+            if (voicesOrder.Length != 4)
+                throw new ArgumentException("The given orderOfVoices is invalid.");
+            else
+            {
+                HashSet<int> voices = new HashSet<int>();
+                HashSet<int> intendedVoices = new HashSet<int>() { 0, 1, 2, 3 };
+                foreach (int voice in voicesOrder)
+                    voices.Add(voice);
+                if (voices != intendedVoices)
+                    throw new ArgumentException("The given orderOfVoices is invalid.");
+            }
 
             string rootPath = "../../../../../";
             tuningTables = new Dictionary<char, Fraction[]>(5);
@@ -137,7 +153,7 @@ namespace AdaptiveBarbershop
         }
 
         /// <summary>
-        /// Vertically tunes the notes inside a chord to just intonation relative to the root
+        /// The vertical step. Tunes the notes inside a chord to just intonation relative to the root
         /// </summary>
         /// <param name="chord"></param>
         /// <param name="print"></param>
@@ -181,14 +197,24 @@ namespace AdaptiveBarbershop
             return indivBend;
         }
 
+        /// <summary>
         /// Set the masterBend for the very first Chord such that the lead sings an equal temperament note
+        /// </summary>
+        /// <param name="firstChord"></param>
+        /// <returns></returns>
         public double InitialMasterBend(Chord firstChord)
         {
             firstChord.masterBend = -firstChord.notes[2].indivBend;
             return firstChord.masterBend;
         }
 
-        /// Horizontally tunes each Chord to optimise the tie, lead and drift constraints of the algorithm
+        /// <summary>
+        /// The horizontal step. Tunes a Chord to optimise the tie, lead and drift constraints of the algorithm.
+        /// </summary>
+        /// <param name="prevChord"></param>
+        /// <param name="currChord"></param>
+        /// <param name="print"></param>
+        /// <returns></returns>
         public double SetMasterBend(Chord prevChord, Chord currChord, bool print = false)
         {
             // Make a list of note indices that have a tie property, ordered like voicesOrder
@@ -345,7 +371,11 @@ namespace AdaptiveBarbershop
             return (ushort)midiNoteBend;
         }
 
+        /// <summary>
         /// Gives some overall statistics on how tuning this song went.
+        /// </summary>
+        /// <param name="song"></param>
+        /// <returns></returns>
         public string AnalyzeTuning(Song song)
         {
             string analysis = "";
@@ -455,8 +485,12 @@ namespace AdaptiveBarbershop
             return analysis;
         }
 
-        /// Given a bend range as a fraction of a half step, randomly assign individual bends to each note in a chord
-        /// This function was mostly useful for debugging
+        /// <summary>
+        /// Given a bend range as a fraction of a half step, randomly assign individual bends to each note in a chord.
+        /// This function was mostly useful for debugging.
+        /// </summary>
+        /// <param name="chord"></param>
+        /// <param name="bendRange"></param>
         public void RandomlyAssignIndivBends(Chord chord, double bendRange = 0.3)
         {
             Random random = new Random();
@@ -478,14 +512,22 @@ namespace AdaptiveBarbershop
             upper = u;
         }
 
-        /// Determines whether a number is within this range
+        /// <summary>
+        /// Determines whether a number x is within this range.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public bool Contains(double x)
         {
             return (x >= lower - 0.0000001 && x <= upper + 0.0000001);
         }
 
-        /// Returns the distance between two ranges if they don't overlap,
-        /// or 0 if they do overlap.
+        /// <summary>
+        /// Returns the distance between two ranges if they don't overlap, or 0 if they do overlap.
+        /// </summary>
+        /// <param name="r1"></param>
+        /// <param name="r2"></param>
+        /// <returns>0 if r1 and r2 overlap; a positive distance if r2 is higher than r1; a negative distance is r2 is lower than r1.</returns>
         public static double Distance(Range r1, Range r2)
         {
             if (r2.lower <= r1.upper + 0.0000001 && r2.upper >= r1.lower - 0.0000001)
@@ -504,7 +546,12 @@ namespace AdaptiveBarbershop
             }
         }
 
-        /// Checks whether two ranges overlap and return the overlapping part
+        /// <summary>
+        /// Returns the overlapping part between two ranges. Always check Distance(r1, r2) first.
+        /// </summary>
+        /// <param name="r1"></param>
+        /// <param name="r2"></param>
+        /// <returns></returns>
         public static Range GetOverlap(Range r1, Range r2)
         {
             if (r1.lower > r1.upper + 0.0000001 || r2.lower > r2.upper + 0.0000001)
@@ -527,7 +574,11 @@ namespace AdaptiveBarbershop
             }
         }
 
+        /// <summary>
         /// Moves both bounds of a Range up by a given distance
+        /// </summary>
+        /// <param name="distance"></param>
+        /// <returns></returns>
         public Range MoveBy(double distance)
         {
             Range res = this;
@@ -536,7 +587,12 @@ namespace AdaptiveBarbershop
             return res;
         }
 
+        /// <summary>
         /// Define equality operators for the Range struct
+        /// </summary>
+        /// <param name="r1"></param>
+        /// <param name="r2"></param>
+        /// <returns></returns>
         public static bool operator ==(Range r1, Range r2)
         {
             return r1.upper == r2.upper && r1.lower == r2.lower;

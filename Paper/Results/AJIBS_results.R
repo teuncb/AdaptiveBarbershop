@@ -176,8 +176,10 @@ par(font=1, ps=font_size)
 ### LEGEND ###
 plot(1, type = "n", axes=FALSE, xlab="", ylab="")
 
+par(ps = font_size + 4)
 legend("bottom",legend = c("posterior drift (c)", "n of tied note retunings", "n of deviations from ET in lead intervals"), 
-       col = cols, pch = pchs, horiz = TRUE, lwd=1, bty='n')
+       col = cols, pch = pchs, horiz = TRUE, lwd=1, bty='n', text.width=0.20)
+par(font=1, ps=font_size)
 
 par(ps = title_size + 5)
 title(main="Proposed algorithm's effects on Ring-A Ding Ding")
