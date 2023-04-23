@@ -52,17 +52,8 @@ namespace AdaptiveBarbershop
 
             voicesOrder = orderOfVoices ?? defaultVoicesOrder;
             // Check validity of voicesOrder
-            if (voicesOrder.Length != 4)
+            if (!(new HashSet<int>() { 0, 1, 2, 3 }.SetEquals(voicesOrder)))
                 throw new ArgumentException("The given orderOfVoices is invalid.");
-            else
-            {
-                HashSet<int> voices = new HashSet<int>();
-                HashSet<int> intendedVoices = new HashSet<int>() { 0, 1, 2, 3 };
-                foreach (int voice in voicesOrder)
-                    voices.Add(voice);
-                if (voices != intendedVoices)
-                    throw new ArgumentException("The given orderOfVoices is invalid.");
-            }
 
             string rootPath = "../../../../../";
             tuningTables = new Dictionary<char, Fraction[]>(5);
