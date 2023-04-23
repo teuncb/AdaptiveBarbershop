@@ -25,12 +25,12 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="16"
-     inkscape:cx="755.59373"
-     inkscape:cy="30.937499"
+     inkscape:zoom="2"
+     inkscape:cx="175.75"
+     inkscape:cy="142.5"
      inkscape:window-width="1920"
      inkscape:window-height="1017"
-     inkscape:window-x="-8"
+     inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1" />
@@ -495,67 +495,67 @@
          y="63.359367">C -31c</tspan></text>
     <path
        style="fill:#800000;stroke:#800000;stroke-width:0.239995px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#Arrow2);marker-end:url(#marker2413)"
-       d="M 23.597,36.965832 V 53.514131"
+       d="M 20,36.965832 V 53.514131"
        id="path1750"
        sodipodi:nodetypes="cc" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05556px;line-height:1.25;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#800000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="24.60216"
+       x="21.956324"
        y="47.575756"
        id="text2545"><tspan
          sodipodi:role="line"
          id="tspan2543"
          style="fill:#800000;stroke-width:0.264583"
-         x="24.60216"
+         x="21.956324"
          y="47.575756">5:4</tspan></text>
     <path
        style="fill:#800000;stroke:#800000;stroke-width:0.17846px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#Arrow2);marker-end:url(#marker2413)"
-       d="m 64.872,36.734175 v 9.150168"
+       d="m 60,36.734175 v 9.150168"
        id="path2615"
        sodipodi:nodetypes="cc" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05556px;line-height:1.25;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#800000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="65.877159"
+       x="61.643822"
        y="43.645035"
        id="text2619"><tspan
          sodipodi:role="line"
          id="tspan2617"
          style="fill:#800000;stroke-width:0.264583"
-         x="65.877159"
+         x="61.643822"
          y="43.645035">8:7</tspan></text>
     <path
        style="fill:#800000;stroke:#800000;stroke-width:0.351879px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#Arrow2);marker-end:url(#marker2413)"
-       d="M 105.75087,9.3251259 V 44.899372"
+       d="M 100,9.3251259 V 44.899372"
        id="path2733"
        sodipodi:nodetypes="cc" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05556px;line-height:1.25;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#800000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="106.75603"
+       x="102.52273"
        y="23.779198"
        id="text2737"><tspan
          sodipodi:role="line"
          id="tspan2735"
          style="fill:#800000;stroke-width:0.264583"
-         x="106.75603"
+         x="102.52273"
          y="23.779198">3:2</tspan></text>
     <path
        style="fill:#800000;stroke:#800000;stroke-width:0.27389px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#Arrow2);marker-end:url(#marker2413)"
-       d="M 146.06848,8.8421737 V 30.394634"
+       d="M 140,8.8421737 V 30.394634"
        id="path2907"
        sodipodi:nodetypes="cc" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05556px;line-height:1.25;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#800000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="147.07364"
+       x="142.84036"
        y="21.95418"
        id="text2911"><tspan
          sodipodi:role="line"
          id="tspan2909"
          style="fill:#800000;stroke-width:0.264583"
-         x="147.07364"
+         x="142.84036"
          y="21.95418">4:3</tspan></text>
     <rect
        style="fill:url(#linearGradient6131);fill-opacity:1;fill-rule:evenodd;stroke-width:0.409202"
@@ -597,19 +597,19 @@
          y="15.495517">G -29c</tspan></text>
     <path
        style="fill:#800000;stroke:#800000;stroke-width:0.232423px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#Arrow2);marker-end:url(#marker2413)"
-       d="M 185.98996,39.105265 V 54.625819"
+       d="M 179.90698,39.105265 V 54.625819"
        id="path6955"
        sodipodi:nodetypes="cc" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05556px;line-height:1.25;font-family:'Times New Roman';-inkscape-font-specification:'Times New Roman, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#800000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="186.99512"
+       x="182.76184"
        y="49.201317"
        id="text6959"><tspan
          sodipodi:role="line"
          id="tspan6957"
          style="fill:#800000;stroke-width:0.264583"
-         x="186.99512"
+         x="182.76184"
          y="49.201317">5:4</tspan></text>
     <text
        xml:space="preserve"
