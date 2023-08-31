@@ -1,5 +1,5 @@
 # AdaptiveBarbershop
-An adaptive just intonation system, that specifically follows the conventions of the barbershop genre. This project was Teun Buwalda's Bachelor's thesis for Kunstmatige Intelligentie at Utrecht University. The full explanation of what it does can be found in the [paper](Paper/AdaptiveBarbershop.pdf).
+An adaptive just intonation system, that specifically follows the conventions of the barbershop genre. This project was Teun Buwalda's Bachelor's thesis for Kunstmatige Intelligentie at Utrecht University. The full explanation of what it does can be found in the [paper](2023-06-01_BachelorThesis_TeunBuwalda_FixedBibNDate.pdf).
 
 # Basic usage
 Change the code in `Program.cs`  to access the tuning system's API:
